@@ -59,37 +59,71 @@ function showTranslationPopup() {
             } else {
                 hideTranslateIcon();
                 translateIcon.src = chrome.runtime.getURL('icons/icon.png');
-                showPopup(response.translation, response.explanation);
+                showPopup(response.translation, response.explanation, response.breakdown);
             }
         });
     }
 }
 
-function showPopup(translation, explanation) {
-    const popup = document.createElement('div');
-    popup.id = 'translation-popup';
-    popup.style.position = 'absolute';
-    popup.style.top = `${cursorPosition.y + window.scrollY}px`;
-    popup.style.left = `${cursorPosition.x + window.scrollX}px`;
-    popup.style.backgroundColor = 'white';
-    popup.style.border = '1px solid black';
-    popup.style.padding = '10px';
-    popup.style.zIndex = '10000';
+function showPopup(translation, explanation, breakdown) {
+    chrome.storage.local.get(['alwaysDisplayExplanation', 'alwaysDisplayBreakdown'], (data) => {
+        const alwaysDisplayExplanation = data.alwaysDisplayExplanation || false;
+        const alwaysDisplayBreakdown = data.alwaysDisplayBreakdown || false;
 
-    popup.innerHTML = `
-    <p><strong>Translation:</strong> ${translation}</p>
-    <p><strong>Explanation:</strong> ${explanation}</p>
-  `;
+        const popup = document.createElement('div');
+        popup.id = 'translation-popup';
+        popup.style.position = 'absolute';
+        popup.style.top = `${cursorPosition.y + window.scrollY}px`;
+        popup.style.left = `${cursorPosition.x + window.scrollX}px`;
+        popup.style.backgroundColor = 'white';
+        popup.style.border = '1px solid black';
+        popup.style.padding = '10px';
+        popup.style.zIndex = '10000';
 
-    document.body.appendChild(popup);
+        popup.innerHTML = `<p><strong>Translation:</strong> ${translation}</p>`;
 
-    const hidePopup = (event) => {
-        if (popup && !popup.contains(event.target) && event.target !== translateIcon) {
-            popup.remove();
-            hideTranslateIcon();
-            document.removeEventListener('mousedown', hidePopup);
+        if (alwaysDisplayExplanation) {
+            popup.innerHTML += `<p><strong>Explanation:</strong> ${explanation}</p>`;
+        } else {
+            const explanationLink = document.createElement('a');
+            explanationLink.href = '#';
+            explanationLink.textContent = 'See Explanation';
+            explanationLink.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent the default link behavior
+                const explanationParagraph = document.createElement('p');
+                explanationParagraph.innerHTML = `<strong>Explanation:</strong> ${explanation}`;
+                popup.appendChild(explanationParagraph);
+                explanationLink.style.display = 'none'; // Hide the link after it's clicked
+            });
+            popup.appendChild(explanationLink);
         }
-    };
 
-    document.addEventListener('mousedown', hidePopup);
+        if (alwaysDisplayBreakdown) {
+            popup.innerHTML += `<p><strong>Breakdown:</strong> ${breakdown}</p>`;
+        } else {
+            const breakdownLink = document.createElement('a');
+            breakdownLink.href = '#';
+            breakdownLink.textContent = 'See Breakdown';
+            breakdownLink.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent the default link behavior
+                const breakdownParagraph = document.createElement('p');
+                breakdownParagraph.innerHTML = `<strong>Breakdown:</strong> ${breakdown}`;
+                popup.appendChild(breakdownParagraph);
+                breakdownLink.style.display = 'none'; // Hide the link after it's clicked
+            });
+            popup.appendChild(breakdownLink);
+        }
+
+        document.body.appendChild(popup);
+
+        const hidePopup = (event) => {
+            if (popup && !popup.contains(event.target) && event.target !== translateIcon) {
+                popup.remove();
+                hideTranslateIcon();
+                document.removeEventListener('mousedown', hidePopup);
+            }
+        };
+
+        document.addEventListener('mousedown', hidePopup);
+    });
 }

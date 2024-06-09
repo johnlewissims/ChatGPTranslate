@@ -10,9 +10,16 @@
     <h1>Settings</h1>
     <p>Please enter your OpenAI API Key below. You can obtain your API key from the <a
             href="https://platform.openai.com/account/api-keys" target="_blank">OpenAI API Keys page</a>.</p>
-    <form id="api-key-form">
+    <form id="settings-form">
         <label for="api-key">OpenAI API Key:</label>
         <input type="text" id="api-key" name="api-key" required>
+        <label>
+            <input type="checkbox" id="always-display-explanation"> Always Display Explanation
+        </label>
+        <label>
+            <input type="checkbox" id="always-display-breakdown"> Always Display Breakdown
+        </label>
+        <br><br>
         <button type="submit">Save</button>
     </form>
     <script src="../scripts/settings.js"></script>
