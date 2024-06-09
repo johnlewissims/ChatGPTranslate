@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 10px;
+}
+  
+button {
+    margin: 5px;
+}
+  
+#translation-popup {
+    max-width: 300px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  input {
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+  
+  button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
