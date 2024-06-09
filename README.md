@@ -1,4 +1,3 @@
-# ChatGPTranslate
 ![ChatGPTranslate](icons/icon128.png)
 
 # ChatGPTranslate
