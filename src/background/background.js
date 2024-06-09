@@ -1,5 +1,3 @@
-importScripts('config.js');
-
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "translateAndExplain",
@@ -43,12 +41,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 async function translateAndExplain(text) {
   const apiUrl = 'https://api.openai.com/v1/chat/completions';
 
-  // Retrieve the API key from Chrome storage or the config file
-  const { OPENAI_API_KEY: settingsApiKey } = await chrome.storage.local.get('OPENAI_API_KEY');
-  const configApiKey = config.OPENAI_API_KEY;
-  const apiKey = configApiKey || settingsApiKey;
+  // Retrieve the API key from Chrome storage
+  const { OPENAI_API_KEY } = await new Promise((resolve, reject) => {
+    chrome.storage.local.get('OPENAI_API_KEY', resolve);
+  });
 
-  if (!apiKey) {
+  if (!OPENAI_API_KEY) {
     throw new Error('API Key not set');
   }
 
@@ -61,7 +59,7 @@ async function translateAndExplain(text) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
+      'Authorization': `Bearer ${OPENAI_API_KEY}`
     },
     body: JSON.stringify({
       model: 'gpt-3.5-turbo',

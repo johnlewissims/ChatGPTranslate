@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const settingsLinks = document.querySelectorAll('.settings-link');
     settingsLinks.forEach(link => {
-        link.href = chrome.runtime.getURL('views/settings.html');
+        link.href = chrome.runtime.getURL('src/views/settings.html');
     });
 
     chrome.storage.local.get(['translation', 'explanation', 'OPENAI_API_KEY'], data => {
