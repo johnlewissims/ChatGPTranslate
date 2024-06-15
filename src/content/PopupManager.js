@@ -2,7 +2,7 @@ import CursorTracker from './CursorTracker.js';
 import TranslateIcon from './TranslateIcon.js';
 
 class PopupManager {
-    async show(translation) {
+    async show(translation, selectedText) {
         const { alwaysDisplayExplanation } = await new Promise((resolve) => {
             chrome.storage.local.get(['alwaysDisplayExplanation'], resolve);
         });
@@ -18,7 +18,17 @@ class PopupManager {
         popup.style.padding = '10px';
         popup.style.zIndex = '10000';
 
-        popup.innerHTML = `<p><strong>Translation:</strong> ${translation}</p>`;
+        const translationSection = document.createElement('div');
+        translationSection.innerHTML = `<p><strong>Translation:</strong> ${translation}</p>`;
+        const ttsIcon = document.createElement('img');
+        ttsIcon.src = chrome.runtime.getURL('src/icons/speaker.png');
+        ttsIcon.style.cursor = 'pointer';
+        ttsIcon.style.width = '24px';
+        ttsIcon.style.height = '24px';
+        ttsIcon.style.display = 'inline';
+        ttsIcon.addEventListener('click', () => this.playTextToSpeech(selectedText));
+        translationSection.appendChild(ttsIcon);
+        popup.appendChild(translationSection);
 
         if (alwaysDisplayExplanation) {
             const explanation = await this.fetchExplanation(translation);
@@ -58,6 +68,20 @@ class PopupManager {
                     reject(response.error);
                 } else {
                     resolve(response.explanation);
+                }
+            });
+        });
+    }
+
+    async playTextToSpeech(text) {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({ action: 'textToSpeech', text: text }, (response) => {
+                if (response.error) {
+                    reject(response.error);
+                } else {
+                    const audio = new Audio(response.audioDataUrl);
+                    audio.play();
+                    resolve();
                 }
             });
         });

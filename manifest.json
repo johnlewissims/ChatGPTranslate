@@ -27,13 +27,14 @@
                 "<all_urls>"
             ],
             "js": [
-                "dist/content.js"
+                "dist/content.bundle.js"
             ]
         }
     ],
     "web_accessible_resources": [
         {
             "resources": [
+                "src/icons/speaker.png",
                 "src/icons/icon.png",
                 "src/icons/icon16.png",
                 "src/icons/icon48.png",

@@ -44,5 +44,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse({ error: error.message });
     });
     return true;
+  } else if (message.action === 'textToSpeech') {
+    OpenAIService.getTextToSpeechDataUrl(message.text).then(dataUrl => {
+        sendResponse({ audioDataUrl: dataUrl });
+    }).catch(error => {
+        sendResponse({ error: error.message });
+    });
+    return true;
   }
 });
