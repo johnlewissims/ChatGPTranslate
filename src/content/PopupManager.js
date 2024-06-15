@@ -1,3 +1,5 @@
+import '../styles/styles.css'; 
+
 import CursorTracker from './CursorTracker.js';
 import TranslateIcon from './TranslateIcon.js';
 
@@ -19,20 +21,22 @@ class PopupManager {
         popup.style.zIndex = '10000';
 
         const translationSection = document.createElement('div');
-        translationSection.innerHTML = `<p><strong>Translation:</strong> ${translation}</p>`;
-        const ttsIcon = document.createElement('img');
-        ttsIcon.src = chrome.runtime.getURL('src/icons/speaker.png');
-        ttsIcon.style.cursor = 'pointer';
-        ttsIcon.style.width = '24px';
-        ttsIcon.style.height = '24px';
-        ttsIcon.style.display = 'inline';
+        translationSection.className = 'translation-section';
+        translationSection.innerHTML = `
+            <div class="translation"><p><strong>Translation:</strong> ${translation}</p></div>
+            <div class="pronunciation">
+                <img src="${chrome.runtime.getURL('src/icons/speaker.png')}" alt="Play translation" id="ttsIcon">
+            </div>
+        `;
+        
+        const ttsIcon = translationSection.querySelector('#ttsIcon');
         ttsIcon.addEventListener('click', () => this.playTextToSpeech(selectedText));
-        translationSection.appendChild(ttsIcon);
+        
         popup.appendChild(translationSection);
 
         if (alwaysDisplayExplanation) {
             const explanation = await this.fetchExplanation(translation);
-            popup.innerHTML += `<p><strong>Explanation:</strong> ${explanation}</p>`;
+            popup.innerHTML += `<div class="explanation"><p><strong>Explanation:</strong> ${explanation}</p></div>`;
         } else {
             const explanationLink = document.createElement('a');
             explanationLink.href = '#';

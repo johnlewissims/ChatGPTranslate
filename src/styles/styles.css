@@ -1,31 +1,56 @@
-body {
-  font-family: Arial, sans-serif;
-  padding: 5px;
-  width: 300px;
-}
-
 #translation-popup {
-  max-width: 300px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
-  font-size: 14px;
+  z-index: 10000;
+  max-width: 300px;
 }
 
-label {
-  display: block;
-  margin-bottom: 5px;
+#translation-popup p {
+  margin: 0 0 5px;
 }
 
-input {
-  margin-bottom: 10px;
-  width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
+#translation-popup p strong {
+  font-weight: bold;
+  color: #333;
 }
 
-button {
-  padding: 10px 15px;
-  background-color: #007bff;
-  color: white;
-  border: none;
+#translation-popup a {
+  text-decoration: underline;
+  font-size: 10px;
+}
+
+#translation-popup a:hover {
+  text-decoration: underline;
+}
+
+#translation-popup img {
   cursor: pointer;
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+}
+
+#translation-popup .icon-container {
+  display: flex;
+  align-items: center;
+}
+
+#translation-popup .translation-section {
+  display: flex;
+}
+
+#translation-popup .translation {
+  padding-right: 10px;
+  width: 95%;
+}
+
+.translation-section .pronunciation {
+  width: 20px;
 }
