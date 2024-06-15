@@ -3,8 +3,8 @@ import TranslateIcon from './TranslateIcon.js';
 
 class PopupManager {
     async show(translation) {
-        const { alwaysDisplayExplanation, alwaysDisplayBreakdown } = await new Promise((resolve) => {
-            chrome.storage.local.get(['alwaysDisplayExplanation', 'alwaysDisplayBreakdown'], resolve);
+        const { alwaysDisplayExplanation } = await new Promise((resolve) => {
+            chrome.storage.local.get(['alwaysDisplayExplanation'], resolve);
         });
 
         const popup = document.createElement('div');
@@ -38,24 +38,6 @@ class PopupManager {
             popup.appendChild(explanationLink);
         }
 
-        if (alwaysDisplayBreakdown) {
-            const breakdown = await this.fetchBreakdown(translation);
-            popup.innerHTML += `<p><strong>Breakdown:</strong> ${breakdown}</p>`;
-        } else {
-            const breakdownLink = document.createElement('a');
-            breakdownLink.href = '#';
-            breakdownLink.textContent = 'See Breakdown';
-            breakdownLink.addEventListener('click', async (event) => {
-                event.preventDefault();
-                const breakdown = await this.fetchBreakdown(translation);
-                const breakdownParagraph = document.createElement('p');
-                breakdownParagraph.innerHTML = `<strong>Breakdown:</strong> ${breakdown}`;
-                popup.appendChild(breakdownParagraph);
-                breakdownLink.style.display = 'none';
-            });
-            popup.appendChild(breakdownLink);
-        }
-
         document.body.appendChild(popup);
 
         const hidePopup = (event) => {
@@ -76,18 +58,6 @@ class PopupManager {
                     reject(response.error);
                 } else {
                     resolve(response.explanation);
-                }
-            });
-        });
-    }
-
-    async fetchBreakdown(text) {
-        return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ action: 'fetchBreakdown', text: text }, (response) => {
-                if (response.error) {
-                    reject(response.error);
-                } else {
-                    resolve(response.breakdown);
                 }
             });
         });

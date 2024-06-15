@@ -42,13 +42,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse({ error: error.message });
     });
     return true;
-  } else if (message.action === 'fetchBreakdown') {
-    fetchBreakdown(message.text).then(response => {
-      sendResponse(response);
-    }).catch(error => {
-      sendResponse({ error: error.message });
-    });
-    return true;
   }
 });
 
@@ -123,36 +116,5 @@ async function fetchExplanation(text) {
     return { explanation: result || "Explanation not available" };
   } else {
     throw new Error(data.error.message || 'Error fetching explanation');
-  }
-}
-
-async function fetchBreakdown(text) {
-  const apiKey = await getAPIKey();
-  const apiUrl = 'https://api.openai.com/v1/chat/completions';
-
-  const messages = [
-    { role: 'system', content: 'You are a helpful assistant that translates text.' },
-    { role: 'user', content: `Provide a word-by-word breakdown of the translation for the following text:\n\n"${text}".` }
-  ];
-
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
-      messages: messages,
-      max_tokens: 100
-    })
-  });
-
-  const data = await response.json();
-  if (response.ok) {
-    const result = data.choices[0].message.content.trim();
-    return { breakdown: result || "Breakdown not available" };
-  } else {
-    throw new Error(data.error.message || 'Error fetching breakdown');
   }
 }
