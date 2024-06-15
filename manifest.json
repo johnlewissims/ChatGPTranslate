@@ -10,7 +10,7 @@
         "storage"
     ],
     "background": {
-        "service_worker": "src/background/background.js"
+        "service_worker": "dist/background.bundle.js"
     },
     "action": {
         "default_popup": "src/views/popup.html",

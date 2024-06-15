@@ -14,4 +14,22 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('instruction-general').style.display = 'block';
         }
     });
+
+    const enableDisableCheckbox = document.getElementById('enable-disable');
+
+    // Load the saved state of the checkbox from chrome storage
+    chrome.storage.local.get('enabled', (data) => {
+        if (data.enabled !== undefined) {
+            enableDisableCheckbox.checked = data.enabled;
+        } else {
+            // Set default to enabled if not set
+            enableDisableCheckbox.checked = true;
+            chrome.storage.local.set({ enabled: true });
+        }
+    });
+
+    enableDisableCheckbox.addEventListener('change', () => {
+        const isEnabled = enableDisableCheckbox.checked;
+        chrome.storage.local.set({ enabled: isEnabled });
+    });
 });

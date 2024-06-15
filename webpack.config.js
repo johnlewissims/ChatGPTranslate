@@ -1,10 +1,13 @@
 const path = require('path');
 
 module.exports = {
-    entry: './src/content/content.js',
+    entry: {
+        background: './src/background/background.js',
+        content: './src/content/content.js'
+    },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'content.js',
+        filename: '[name].bundle.js'
     },
     module: {
         rules: [
@@ -20,4 +23,7 @@ module.exports = {
             },
         ],
     },
+    resolve: {
+        extensions: ['.js']
+    }
 };

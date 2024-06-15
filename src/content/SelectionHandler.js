@@ -7,12 +7,14 @@ class SelectionHandler {
 
     init() {
         document.addEventListener('mouseup', () => {
-            this.selectedText = window.getSelection().toString().trim();
-            if (this.selectedText) {
-                TranslateIcon.show();
-            } else {
-                TranslateIcon.hide();
-            }
+            chrome.storage.local.get('enabled', (data) => {
+                this.selectedText = window.getSelection().toString().trim();
+                if (this.selectedText && data.enabled) {
+                    TranslateIcon.show();
+                } else {
+                    TranslateIcon.hide();
+                }
+            });
         });
 
         document.addEventListener('mousedown', (event) => {
