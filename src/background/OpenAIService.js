@@ -82,7 +82,7 @@ class OpenAIService {
     async fetchExplanation(text) {
         const messages = [
             { role: 'system', content: 'You are a helpful assistant that provides explanations.' },
-            { role: 'user', content: `Provide an explanation for the following text:\n\n"${text}"` }
+            { role: 'user', content: `Provide a short explanation for the following text in English: \n\n"${text}"` }
         ];
         const result = await this.callOpenAI(messages);
         return { explanation: result || "Explanation not available" };
