@@ -54,3 +54,8 @@
 .translation-section .pronunciation {
   width: 20px;
 }
+
+#translation-popup .explanation {
+  font-size: 12px;
+  color: #666;
+}

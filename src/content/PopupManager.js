@@ -35,7 +35,7 @@ class PopupManager {
         popup.appendChild(translationSection);
 
         if (alwaysDisplayExplanation) {
-            const explanation = await this.fetchExplanation(translation);
+            const explanation = await this.fetchExplanation(selectedText);
             popup.innerHTML += `<div class="explanation"><p><strong>Explanation:</strong> ${explanation}</p></div>`;
         } else {
             const explanationLink = document.createElement('a');
@@ -43,9 +43,9 @@ class PopupManager {
             explanationLink.textContent = 'See Explanation';
             explanationLink.addEventListener('click', async (event) => {
                 event.preventDefault();
-                const explanation = await this.fetchExplanation(translation);
+                const explanation = await this.fetchExplanation(selectedText);
                 const explanationParagraph = document.createElement('p');
-                explanationParagraph.innerHTML = `<strong>Explanation:</strong> ${explanation}`;
+                explanationParagraph.innerHTML = `<div class="explanation"><strong>Explanation:</strong> ${explanation}</div>`;
                 popup.appendChild(explanationParagraph);
                 explanationLink.style.display = 'none';
             });
