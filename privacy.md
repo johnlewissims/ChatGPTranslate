@@ -21,7 +21,6 @@ The Extension requires certain permissions to function properly:
 activeTab: To interact with the currently active tab and process the highlighted text.
 contextMenus: To add context menu items for translation and explanation.
 host permissions: To allow the Extension to run on all web pages so that text can be highlighted and translated.
-scripting: To inject necessary scripts into web pages for text selection and displaying the translation popup.
 storage: To store the user’s OpenAI API key and preferences locally on their device.
 
 5. Data Security
