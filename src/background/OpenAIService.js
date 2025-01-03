@@ -31,7 +31,7 @@ class OpenAIService {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${apiKey}`
+                'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
                 model: gptModel,
@@ -85,8 +85,6 @@ class OpenAIService {
         });
         let answerFormattingOption = '';
         if (getTranslationAsHTML && text?.length < 50 && text.split(' ').length < 5) {
-            // No need to explain large text block
-            //Describe possible meanings in ${language}.
             answerFormattingOption = `. Detect text language. Provide a translation to ${language}. Describe usage options in detected text language with explanation in ${language}. Add examples in the detected text language with translation to ${language}. Show the answer as HTML. Text`;
         }
         const languageHint = !languageCode ? '' : `from ${languageCode}`;
