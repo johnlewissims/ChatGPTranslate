@@ -31,7 +31,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       chrome.action.openPopup();
     });
   } else if (message.action === 'translateAndExplain') {
-    OpenAIService.translateText(message.text).then(response => {
+    OpenAIService.translateText(message.text, message.languageCode).then(response => {
       sendResponse(response);
     }).catch(error => {
       sendResponse({ error: error.message });

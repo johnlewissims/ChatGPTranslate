@@ -17,6 +17,8 @@ class TranslateIcon {
             this.icon.style.zIndex = '10000';
             this.icon.style.width = '24px';
             this.icon.style.height = '24px';
+            this.icon.style.margin = '0';
+            this.icon.style.padding = '0';
             this.icon.addEventListener('click', () => this.onClick());
             document.body.appendChild(this.icon);
         }
@@ -53,7 +55,13 @@ class TranslateIcon {
         }
 
         if (selectedText) {
-            chrome.runtime.sendMessage({ action: 'translateAndExplain', text: selectedText }, (response) => {
+            const languageCode = document?.documentElement?.lang?.toUpperCase() ?? '';
+            const message = {
+                action: 'translateAndExplain',
+                text: selectedText,
+                languageCode: languageCode,
+            };
+            chrome.runtime.sendMessage(message, (response) => {
                 if (response.error) {
                     alert('Error fetching translation.');
                     console.error('Error:', response.error);

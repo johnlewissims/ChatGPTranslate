@@ -13,8 +13,9 @@ class PopupManager {
         popup.id = 'translation-popup';
         const { x, y, scrollX, scrollY } = CursorTracker.getPosition();
         popup.style.position = 'absolute';
-        popup.style.top = `${y + scrollY}px`;
-        popup.style.left = `${x + scrollX}px`;
+        popup.style.top = `${Math.round(window.innerHeight * 0.2) + scrollY}px`;
+        popup.style.left = `${Math.round(window.innerWidth * 0.15) + scrollX}px`;
+        popup.style.maxWidth = `calc(70VW)`;
         popup.style.backgroundColor = 'white';
         popup.style.border = '1px solid black';
         popup.style.padding = '10px';

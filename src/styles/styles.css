@@ -1,3 +1,7 @@
+body {
+  font-size: 16px;
+}
+
 #translation-popup {
   position: absolute;
   top: 0;
@@ -61,5 +65,5 @@
 }
 
 .navbar-popup {
-  width: 250px;
+  width: 300px;
 }

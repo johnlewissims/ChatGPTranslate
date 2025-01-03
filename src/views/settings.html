@@ -8,15 +8,35 @@
 
 <body>
     <h1>Settings</h1>
-    <p>Please enter your OpenAI API Key below. You can obtain your API key from the <a
-            href="https://platform.openai.com/account/api-keys" target="_blank">OpenAI API Keys page</a>.</p>
     <form id="settings-form">
-        <label for="api-key">OpenAI API Key:</label>
-        <input type="text" id="api-key" name="api-key" required>
+        <div class="item">Please enter your preferred OpenAI model. OpenAI models are listed on the <a href="https://platform.openai.com/docs/models#current-model-aliases" target="_blank">OpenAI Models page</a>.
+            <br>
+            <label for="gpt-model">GPT model:
+                <input type="text" id="gpt-model" name="gpt-model" required>
+            </label>
+        </div>
+        <div class="item">Please enter your OpenAI API Key below. You can obtain your API key from the <a
+            href="https://platform.openai.com/account/api-keys" target="_blank">OpenAI API Keys page</a>.
+            <br>
+            <label for="api-key">OpenAI API Key:
+                <textarea type="text" id="api-key" name="api-key" rows="3" required></textarea>
+            </label>
+        </div>
+        <div class="item">
+        <label for="language">Your language:
+            <input type="text" id="language" name="language" required>
+        </label>
+        </div>
+        <div class="item">
         <label>
             <input type="checkbox" id="always-display-explanation"> Always Display Explanation
         </label>
-        <br><br>
+        </div>
+        <div class="item">
+        <label>
+            <input type="checkbox" id="get-translation-as-html">Provide a translation, describe possible meanings and usage options with examples, and output the result in HTML.
+        </label>
+        </div>
         <button type="submit">Save</button>
     </form>
     <script src="../scripts/settings.js"></script>
