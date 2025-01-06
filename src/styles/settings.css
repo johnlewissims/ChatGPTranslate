@@ -7,6 +7,11 @@ body {
     margin-bottom: 1rem;
 }
 
+.item label {
+    min-width: 130px;
+    display: inline-block;
+}
+
 button {
     margin-top: 1rem;
     margin-left: 20px;
@@ -16,4 +21,9 @@ button {
 textarea[name="api-key"] {
     min-width:300px;
     margin-top: .5rem;
+    box-sizing: border-box;
+}
+
+select {
+    min-width: 300px;
 }

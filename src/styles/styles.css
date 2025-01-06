@@ -3,9 +3,10 @@ body {
 }
 
 #translation-popup {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: fixed;
+  top: 40VH;
+  left: 50VW;
+  transform: translate(-50%, -50%);
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -13,9 +14,10 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
   z-index: 10000;
-  max-width: 300px;
+  max-width : min(calc(70VW), 900px);
 }
 
+#translation-popup,
 #translation-popup h1,
 #translation-popup h2,
 #translation-popup h3,
@@ -29,14 +31,9 @@ body {
   margin: 0 0 5px;
 }
 
-#translation-popup p strong {
-  font-weight: bold;
-  color: #333;
-}
-
 #translation-popup a {
   text-decoration: underline;
-  font-size: 10px;
+  font-size: .75em;
 }
 
 #translation-popup a:hover {
@@ -71,8 +68,18 @@ body {
 }
 
 #translation-popup .explanation {
-  font-size: 12px;
+  font-size: .75em;
   color: #666;
+}
+
+#translation-popup .explanation strong {
+  font-weight: bold;
+  color: #333;
+}
+
+#translation-popup pre {
+  width: 100%;
+  text-wrap: auto;
 }
 
 .navbar-popup {

@@ -1,30 +1,26 @@
+import SettingsService from '../background/SettingsService.js';
 import '../styles/styles.css'; 
 
-import CursorTracker from './CursorTracker.js';
 import TranslateIcon from './TranslateIcon.js';
 
 class PopupManager {
     async show(translation, selectedText) {
-        const { alwaysDisplayExplanation } = await new Promise((resolve) => {
-            chrome.storage.local.get(['alwaysDisplayExplanation'], resolve);
-        });
+        const  alwaysDisplayExplanation  = await SettingsService.getAlwaysDisplayExplanation();
 
         const popup = document.createElement('div');
         popup.id = 'translation-popup';
-        const { x, y, scrollX, scrollY } = CursorTracker.getPosition();
-        popup.style.position = 'absolute';
-        popup.style.top = `${Math.round(window.innerHeight * 0.2) + scrollY}px`;
-        popup.style.left = `${Math.round(window.innerWidth * 0.15) + scrollX}px`;
-        popup.style.maxWidth = `calc(70VW)`;
-        popup.style.backgroundColor = 'white';
-        popup.style.border = '1px solid black';
-        popup.style.padding = '10px';
-        popup.style.zIndex = '10000';
-
         const translationSection = document.createElement('div');
         translationSection.className = 'translation-section';
         translationSection.innerHTML = `
-            <div class="translation"><p><strong>Translation:</strong> ${translation}</p></div>
+            <div class="translation">
+                <p>
+                    <strong>Translation:</strong>
+                    <b>${selectedText}</b>
+                </p>
+                <p>
+                    ${translation}
+                </p>
+            </div>
             <div class="pronunciation">
                 <img src="${chrome.runtime.getURL('src/icons/speaker.png')}" alt="Play translation" id="ttsIcon">
             </div>
@@ -41,6 +37,7 @@ class PopupManager {
         } else {
             const explanationLink = document.createElement('a');
             explanationLink.href = '#';
+            explanationLink.classList.add('explanation-link');
             explanationLink.textContent = 'See Explanation';
             explanationLink.addEventListener('click', async (event) => {
                 event.preventDefault();

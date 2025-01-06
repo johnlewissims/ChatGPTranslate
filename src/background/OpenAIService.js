@@ -1,32 +1,16 @@
+import { getLanguageHint } from './LanguageDetection.js';
+import SettingsService from './SettingsService.js';
+
 class OpenAIService {
     constructor() {
         this.apiUrl = 'https://api.openai.com/v1/chat/completions';
         this.ttsApiUrl = 'https://api.openai.com/v1/audio/speech';
     }
 
-    async getGptModel() {
-        const { gptModel = 'gpt-4o' } = await new Promise((resolve) => {
-            chrome.storage.local.get(['gptModel'], resolve);
-        });
-
-        return gptModel;
-    }
-
-    async getAPIKey() {
-        const { OPENAI_API_KEY } = await new Promise((resolve) => {
-            chrome.storage.local.get('OPENAI_API_KEY', resolve);
-        });
-
-        if (!OPENAI_API_KEY) {
-            throw new Error('API Key not set');
-        }
-
-        return OPENAI_API_KEY;
-    }
-
     async callOpenAI(messages) {
-        const gptModel = await this.getGptModel();
-        const apiKey = await this.getAPIKey();
+        const gptModel = await SettingsService.getGptModel();
+        const apiKey = await SettingsService.getAPIKey();
+        const maxTokens = await SettingsService.getMaxTokens();
         const response = await fetch(this.apiUrl, {
             method: 'POST',
             headers: {
@@ -36,20 +20,23 @@ class OpenAIService {
             body: JSON.stringify({
                 model: gptModel,
                 messages: messages,
-                max_tokens: 100
+                max_tokens: maxTokens
             })
         });
 
         const data = await response.json();
         if (response.ok) {
-            return data.choices[0].message.content.trim() + ` (${gptModel})`;
+            const completionTokens = data.usage?.completion_tokens ?? '-';
+            const promptTokens = data.usage?.prompt_tokens ?? '-';
+            const totalTokens = data.usage?.total_tokens ?? '-';
+            return data.choices[0].message.content.trim() + `\n(${gptModel}, tokens prompt:${promptTokens}, completion:${completionTokens}, total:${totalTokens})`;
         } else {
             throw new Error(data.error.message || 'Error fetching data from OpenAI');
         }
     }
 
     async getTextToSpeechDataUrl(text) {
-        const apiKey = await this.getAPIKey();
+        const apiKey = await SettingsService.getAPIKey();
         const response = await fetch(this.ttsApiUrl, {
             method: 'POST',
             headers: {
@@ -80,26 +67,30 @@ class OpenAIService {
     }
 
     async translateText(text, languageCode = '') {
-        const { getTranslationAsHTML, language = 'English' } = await new Promise((resolve) => {
-            chrome.storage.local.get(['getTranslationAsHTML', 'language'], resolve);
-        });
+        const language = await SettingsService.getLanguage();
+        const getDetailedTranslation = await SettingsService.getDetailedTranslation();
+        const getTranslationAsHtml = getDetailedTranslation && await SettingsService.getTranslationAsHtml();
         let answerFormattingOption = '';
-        if (getTranslationAsHTML && text?.length < 50 && text.split(' ').length < 5) {
-            answerFormattingOption = `. Detect text language. Provide a translation to ${language}. Describe usage options in detected text language with explanation in ${language}. Add examples in the detected text language with translation to ${language}. Show the answer as HTML. Text`;
+        if (getDetailedTranslation && text?.length < 50 && text.split(' ').length < 5) {
+            const showAsHtmlText = getTranslationAsHtml ? 'Show the answer as HTML. ' : '';
+            answerFormattingOption = `. Detect text language. Provide a translation to ${language}. Describe usage options in detected text language with explanation in ${language}. Add examples in the detected text language with translation to ${language}.${showAsHtmlText} Text`;
         }
-        const languageHint = !languageCode ? '' : `from ${languageCode}`;
+        const languageHint = getLanguageHint(languageCode);
         const messages = [
             { role: 'system', content: 'You are a helpful assistant that translates text.' },
             { role: 'user', content: `Translate the following text ${languageHint} to ${language} ${answerFormattingOption}:\n\n"${text}"` }
         ];
         const result = await this.callOpenAI(messages);
+
+        if (!getTranslationAsHtml) {
+            return { translation: `<pre>${result}</pre>` || "Translation not available" };    
+        }
+        
         return { translation: result || "Translation not available" };
     }
 
     async fetchExplanation(text) {
-        const { language } = await new Promise((resolve) => {
-            chrome.storage.local.get(['language'], resolve);
-        });
+        const language = await SettingsService.getLanguage();
 
         const messages = [
             { role: 'system', content: 'You are a helpful assistant that provides explanations.' },
