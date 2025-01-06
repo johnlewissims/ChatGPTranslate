@@ -5,8 +5,11 @@ const populateLanguageHintTemplateWithValue = (value) => {
     return languageHintTemplate.replace('{0}', value);
 }
 
-const getLanguageHint = (languageCode = '') => {
+const getLanguageHint = (languageCode = '', targetLanguage = '') => {
     if (!languageCode) {
+        return ''
+    }
+    if (languageCode === targetLanguage) {
         return ''
     }
     let codeOnly = ''

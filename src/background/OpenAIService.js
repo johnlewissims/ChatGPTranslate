@@ -75,7 +75,7 @@ class OpenAIService {
             const showAsHtmlText = getTranslationAsHtml ? 'Show the answer as HTML. ' : '';
             answerFormattingOption = `. Detect text language. Provide a translation to ${language}. Describe usage options in detected text language with explanation in ${language}. Add examples in the detected text language with translation to ${language}.${showAsHtmlText} Text`;
         }
-        const languageHint = getLanguageHint(languageCode);
+        const languageHint = getLanguageHint(languageCode, language);
         const messages = [
             { role: 'system', content: 'You are a helpful assistant that translates text.' },
             { role: 'user', content: `Translate the following text ${languageHint} to ${language} ${answerFormattingOption}:\n\n"${text}"` }

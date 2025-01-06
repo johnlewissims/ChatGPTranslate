@@ -44,8 +44,11 @@ class TranslateIcon {
 
     onClick() {
         this.icon.src = chrome.runtime.getURL('src/icons/loading-spinner.gif');
-        const selectedText = window.getSelection().toString().trim();
-
+        const selection = window.getSelection();
+        const selectedText = selection.toString().trim();
+        if (!selectedText) {
+            return;
+        }
         // if length of selected text is > 500, return error
         if (selectedText.length > 500) {
             alert('Selected text is too long. Please select less than 500 characters.');
@@ -53,25 +56,34 @@ class TranslateIcon {
             this.icon.src = chrome.runtime.getURL('src/icons/icon.png');
             return;
         }
-
-        if (selectedText) {
-            const languageCode = document?.documentElement?.lang?.toUpperCase() ?? '';
-            const message = {
-                action: 'translateAndExplain',
-                text: selectedText,
-                languageCode: languageCode,
-            };
-            chrome.runtime.sendMessage(message, (response) => {
-                if (response.error) {
-                    alert('Error fetching translation.');
-                    console.error('Error:', response.error);
-                } else {
-                    this.hide();
-                    this.icon.src = chrome.runtime.getURL('src/icons/icon.png');
-                    PopupManager.show(response.translation, selectedText);
-                }
-            });
+        // Try to get a language code from the nearest parent.
+        let languageCode = '';
+        let node = selection.anchorNode;
+        while (!!node) {
+            if (node.lang) {
+                languageCode = node.lang;
+                break
+            }
+            node = node.parentNode;
         }
+        if (languageCode === '') {
+            languageCode = document?.documentElement?.lang?.toUpperCase() ?? '';
+        }
+        const message = {
+            action: 'translateAndExplain',
+            text: selectedText,
+            languageCode: languageCode,
+        };
+        chrome.runtime.sendMessage(message, (response) => {
+            if (response.error) {
+                alert('Error fetching translation.');
+                console.error('Error:', response.error);
+            } else {
+                this.hide();
+                this.icon.src = chrome.runtime.getURL('src/icons/icon.png');
+                PopupManager.show(response.translation, selectedText);
+            }
+        });
     }
 }
 
