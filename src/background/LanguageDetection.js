@@ -6,7 +6,6 @@ const populateLanguageHintTemplateWithValue = (value) => {
 }
 
 const getLanguageHint = (languageCode = '') => {
-    console.log('language code: ', languageCode)
     if (!languageCode) {
         return ''
     }
