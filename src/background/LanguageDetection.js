@@ -9,9 +9,6 @@ const getLanguageHint = (languageCode = '', targetLanguage = '') => {
     if (!languageCode) {
         return ''
     }
-    if (languageCode === targetLanguage) {
-        return ''
-    }
     let codeOnly = ''
     if (languageCode.length === 2) {
         codeOnly = languageCode.toLocaleLowerCase();
@@ -21,6 +18,9 @@ const getLanguageHint = (languageCode = '', targetLanguage = '') => {
     if (codeOnly) {
         const language = Languages[codeOnly];
         if (language) {
+            if (language.toLocaleLowerCase() === targetLanguage.toLocaleLowerCase()) {
+                return ''
+            }
             return populateLanguageHintTemplateWithValue(language);
         }
     }
