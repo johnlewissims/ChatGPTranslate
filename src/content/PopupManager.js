@@ -38,6 +38,7 @@ class PopupManager {
             const explanationLink = document.createElement('a');
             explanationLink.href = '#';
             explanationLink.classList.add('explanation-link');
+            explanationLink.classList.add('default-color');
             explanationLink.textContent = 'See Explanation';
             explanationLink.addEventListener('click', async (event) => {
                 event.preventDefault();

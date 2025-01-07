@@ -1,10 +1,5 @@
 import { Languages} from '../scripts/defaultSettings'
 
-const populateLanguageHintTemplateWithValue = (value) => {
-    const languageHintTemplate = 'from {0}';
-    return languageHintTemplate.replace('{0}', value);
-}
-
 const getLanguageHint = (languageCode = '', targetLanguage = '') => {
     if (!languageCode) {
         return ''
@@ -21,7 +16,7 @@ const getLanguageHint = (languageCode = '', targetLanguage = '') => {
             if (language.toLocaleLowerCase() === targetLanguage.toLocaleLowerCase()) {
                 return ''
             }
-            return populateLanguageHintTemplateWithValue(language);
+            return language;
         }
     }
     return '';

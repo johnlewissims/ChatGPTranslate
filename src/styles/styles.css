@@ -1,12 +1,8 @@
-body {
-  font-size: 16px;
-}
-
 #translation-popup {
   position: fixed;
   top: 40VH;
   left: 50VW;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, max(-50%, -40VH));
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -23,12 +19,11 @@ body {
 #translation-popup h3,
 #translation-popup p,
 #translation-popup li,
-#translation-popup div {
+#translation-popup div,
+#translation-popup pre {
   color: black;
-}
-
-#translation-popup p {
-  margin: 0 0 5px;
+  font-size: 16px;
+  margin: 0 0 4px;
 }
 
 #translation-popup a {
@@ -36,8 +31,17 @@ body {
   font-size: .75em;
 }
 
+ #translation-popup .default-color:link {
+  color: LinkText;
+}
+
 #translation-popup a:hover {
   text-decoration: underline;
+}
+
+#translation-popup ol,
+#translation-popup ul {
+  padding:0 0 0 32px;
 }
 
 #translation-popup img {
@@ -68,7 +72,7 @@ body {
 }
 
 #translation-popup .explanation {
-  font-size: .75em;
+  font-size: 12px;
   color: #666;
 }
 
@@ -84,4 +88,5 @@ body {
 
 .navbar-popup {
   width: 300px;
+  font-size: 16px;
 }

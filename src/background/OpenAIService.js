@@ -66,26 +66,59 @@ class OpenAIService {
         });
     }
 
+    canRequestDetailDescription(text) {
+        return text && text?.length < 50 && text.split(' ').length < 5;
+    }
+
+    getOutBlocksMessages(language, isDetailedTranslation = false) {
+        if (isDetailedTranslation) {
+            return [
+                {role:"user", content: "Output must contain 4 blocks."},
+                {role:"user", content: "1: Detected language." },
+                {role:"user", content: `2: Translation to ${language}.` },
+                {role:"user", content: `3: Description of the options for using the text in ${language}.` },
+                {role:"user", content: `4: Three examples with text in detected language with translation to ${language}.` },
+                {role:"user", content: `Block headers must be in ${language}}.` }
+            ];
+        }
+
+        return [
+            {role:"user", content:"Output must contain 2 blocks."},
+            {role:"user", content: "1: Detected language." },
+            {role:"user", content: `2: Translation to ${language}}.` },
+            {role:"user", content: `Block headers must be in ${language}}.` }
+        ];
+    }
+
     async translateText(text, languageCode = '') {
         const language = await SettingsService.getLanguage();
-        const getDetailedTranslation = await SettingsService.getDetailedTranslation();
-        const getTranslationAsHtml = getDetailedTranslation && await SettingsService.getTranslationAsHtml();
-        let answerFormattingOption = '';
-        if (getDetailedTranslation && text?.length < 50 && text.split(' ').length < 5) {
-            const showAsHtmlText = getTranslationAsHtml ? 'Show the answer as HTML. ' : '';
-            answerFormattingOption = `. Detect text language. Provide a translation to ${language}. Describe usage options in detected text language with explanation in ${language}. Add examples in the detected text language with translation to ${language}.${showAsHtmlText} Text`;
-        }
+        const isDetailRequest = this.canRequestDetailDescription(text);
+        const isDetailedTranslation = isDetailRequest && await SettingsService.getDetailedTranslation() ;
+        const isTranslationAsHtml = await SettingsService.getTranslationAsHtml();
+        const outputBlocksDescription = this.getOutBlocksMessages(language, isDetailedTranslation);
         const languageHint = getLanguageHint(languageCode, language);
+        const languageHintMessage = languageHint ? [{ role: 'user', content: `I think this text in ${languageHint} language.` }] : [];
         const messages = [
             { role: 'system', content: 'You are a helpful assistant that translates text.' },
-            { role: 'user', content: `Translate the following text ${languageHint} to ${language} ${answerFormattingOption}:\n\n"${text}"` }
+            { role: 'system', content: `User language is ${language}.` },
+            { role: 'system', content: 'Detect text language.' },
+            ...languageHintMessage,
+            { role:"user", content: `Output must be in ${language}.`},
+            ...outputBlocksDescription,
+            { role: 'user', content: `Text:\n\n"${text}"` }
         ];
-        const result = await this.callOpenAI(messages);
 
-        if (!getTranslationAsHtml) {
-            return { translation: `<pre>${result}</pre>` || "Translation not available" };    
+        if (isTranslationAsHtml) {
+            messages.push({ role: "user", content: `Output must be in HTML without <head> and <body> tags.` });
         }
-        
+        let result = await this.callOpenAI(messages);
+        if (!isTranslationAsHtml) {
+            return { translation: `<pre>${result}</pre>` || "Translation not available" };
+        }
+        else if (result.startsWith('```html')) {
+            result = result.replace("```html\n", "").replace("\n```", "\n");
+        }
+
         return { translation: result || "Translation not available" };
     }
 
