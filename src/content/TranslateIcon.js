@@ -2,12 +2,35 @@ import CursorTracker from './CursorTracker.js';
 import PopupManager from './PopupManager.js';
 
 class TranslateIcon {
+    MAX_LENGTH_TEXT_FOR_TRANSLATION = 500;
+    MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION = 40;
+    ROW_GAP_BETWEEN_ICONS = 32;
+
     constructor() {
         this.icon = null;
         this.iconDetailed = null;
     }
 
     init() { }
+
+    displayIconDetailed() {
+        const selectedText = window.getSelection().toString().trim();
+        return selectedText && selectedText.length <= this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION
+    }
+
+    createIcon() {
+        const icon = document.createElement('img');
+        icon.style.position = 'absolute';
+        icon.style.cursor = 'pointer';
+        icon.style.zIndex = '10000';
+        icon.style.width = '24px';
+        icon.style.height = '24px';
+        icon.style.margin = '0';
+        icon.style.padding = '0';
+        icon.style.backgroundColor = 'white';
+        icon.style.borderRadius = '4px';
+        return icon;
+    }
 
     show() {
         if (this.icon?.style?.display === 'block' || this.iconDetailed?.style?.display === 'block') {
@@ -18,18 +41,8 @@ class TranslateIcon {
         const { x, y, scrollX, scrollY } = CursorTracker.getPosition();
         const scrollXWithShift = scrollX + 16;
         if (!this.icon) {
-            this.icon = document.createElement('img');
+            this.icon = this.createIcon();
             this.icon.src = chrome.runtime.getURL('src/icons/icon.png');
-            this.icon.style.position = 'absolute';
-            this.icon.style.cursor = 'pointer';
-            this.icon.style.zIndex = '10000';
-            this.icon.style.width = '24px';
-            this.icon.style.height = '24px';
-            this.icon.style.margin = '0';
-            this.icon.style.padding = '0';
-            this.icon.style.backgroundColor = 'white';
-            this.icon.style.borderRadius = '4px';
-            this.icon.title = 'Translate';
             this.icon.title = 'Translate the selected text';
             this.icon.addEventListener('click', () => this.onClick());
             document.body.appendChild(this.icon);
@@ -45,28 +58,22 @@ class TranslateIcon {
         this.icon.style.display = 'block';
 
         if (!this.iconDetailed) {
-            this.iconDetailed = document.createElement('img');
+            this.iconDetailed = this.createIcon();
             this.iconDetailed.src = chrome.runtime.getURL('src/icons/iconDetailedTranslation.png');
-            this.iconDetailed.style.position = 'absolute';
-            this.iconDetailed.style.cursor = 'pointer';
-            this.iconDetailed.style.zIndex = '10000';
-            this.iconDetailed.style.width = '24px';
-            this.iconDetailed.style.height = '24px';
-            this.iconDetailed.style.margin = '0';
-            this.iconDetailed.style.padding = '0';
-            this.iconDetailed.style.backgroundColor = 'white';
-            this.iconDetailed.style.borderRadius = '4px';
             this.iconDetailed.title = 'Translate the selected text and provide usage options with examples.';
             this.iconDetailed.addEventListener('click', () => this.onClickDetailed());
             document.body.appendChild(this.iconDetailed);
             this.iconDetailed.style.top = `${y + scrollY}px`;
-            this.iconDetailed.style.left = `${x + 32 + scrollXWithShift}px`;
+            this.iconDetailed.style.left = `${x + this.ROW_GAP_BETWEEN_ICONS + scrollXWithShift}px`;
         }
         if (this.iconDetailed.style.display !== 'block') {
             this.iconDetailed.style.top = `${y + scrollY}px`;
-            this.iconDetailed.style.left = `${x + 32 + scrollXWithShift}px`;
+            this.iconDetailed.style.left = `${x + this.ROW_GAP_BETWEEN_ICONS + scrollXWithShift}px`;
         }
-        this.iconDetailed.style.display = 'block';
+
+        if (this.displayIconDetailed()) {
+            this.iconDetailed.style.display = 'block';
+        }
     }
 
     hide() {
@@ -95,9 +102,9 @@ class TranslateIcon {
         if (!selectedText) {
             return;
         }
-        // if length of selected text is > 500, return error
-        if (selectedText.length > 500) {
-            alert('Selected text is too long. Please select less than 500 characters.');
+        // if length of selected text is > this.MAX_LENGTH_TEXT_FOR_TRANSLATION, return error
+        if (selectedText.length > this.MAX_LENGTH_TEXT_FOR_TRANSLATION) {
+            alert(`Selected text is too long. Please select less than ${this.MAX_LENGTH_TEXT_FOR_TRANSLATION} characters.`);
             this.hide();
             this.icon.src = chrome.runtime.getURL('src/icons/icon.png');
             return;
@@ -140,9 +147,8 @@ class TranslateIcon {
         if (!selectedText) {
             return;
         }
-        // if length of selected text is > 100, return error
-        if (selectedText.length > 100) {
-            alert('Selected text is too long. Please select less than 100 characters.');
+        if (selectedText.length > this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION) {
+            alert(`Selected text is too long. Please select less than ${this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION} characters.`);
             this.hide();
             this.iconDetailed.src = chrome.runtime.getURL('src/icons/iconDetailedTranslation.png');
             return;
