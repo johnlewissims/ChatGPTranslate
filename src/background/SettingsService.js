@@ -72,6 +72,13 @@ class SettingsService {
         });
         return !!getDetailedTranslation;
     }
+
+    async getDisplayTokens() {
+        const { displayTokens } = await new Promise((resolve) => {
+            chrome.storage.local.get('displayTokens', resolve);
+        });
+        return !!displayTokens;
+    }
 }
 
 export default new SettingsService();

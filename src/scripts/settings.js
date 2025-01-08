@@ -76,7 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'gptModel',
         'maxTokens',
         'getDetailedTranslation',
-        'getTranslationAsHtml'
+        'getTranslationAsHtml',
+        'displayTokens'
     ], function (result) {
         const model = document.getElementById('gpt-model');
         model.value = result.gptModel ?? DefaultSettings.gptModel;
@@ -89,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('get-translation-as-html').checked = !!result.getTranslationAsHtml;
         document.getElementById('language').value = result.language ?? DefaultSettings.language;
         document.getElementById('max-tokens').value = result.maxTokens ?? DefaultSettings.MaxTokens;
+        document.getElementById('display-tokens').checked = !!result.displayTokens;
         updateGptModelAttributeDisabled();
     });
 
@@ -108,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const gptModel = document.getElementById('gpt-model').value;
         const maxTokens = document.getElementById('max-tokens').value;
+        const displayTokens = document.getElementById('display-tokens').checked;
 
         const values = {
             OPENAI_API_KEY: apiKey,
@@ -116,7 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
             alwaysDisplayExplanation: alwaysDisplayExplanation,
             maxTokens: maxTokens,
             getDetailedTranslation: getDetailedTranslation,
-            getTranslationAsHtml: getTranslationAsHtml
+            getTranslationAsHtml: getTranslationAsHtml,
+            displayTokens: displayTokens
         }
         chrome.storage.local.set(values, function () {
             alert('Settings saved successfully!');

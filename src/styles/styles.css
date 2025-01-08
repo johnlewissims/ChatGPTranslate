@@ -1,9 +1,10 @@
 #translation-popup {
+  --main-bg-color: white;
   position: fixed;
   top: 40VH;
   left: 50VW;
   transform: translate(-50%, max(-50%, -40VH));
-  background-color: white;
+  background-color: var(--main-bg-color);
   border: 1px solid #ccc;
   border-radius: 10px;
   padding: 15px;
@@ -84,6 +85,7 @@
 #translation-popup pre {
   width: 100%;
   text-wrap: auto;
+  background-color: var(--main-bg-color);
 }
 
 .navbar-popup {

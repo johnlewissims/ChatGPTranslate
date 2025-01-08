@@ -11,6 +11,7 @@ class OpenAIService {
         const gptModel = await SettingsService.getGptModel();
         const apiKey = await SettingsService.getAPIKey();
         const maxTokens = await SettingsService.getMaxTokens();
+        const displayTokens = await SettingsService.getDisplayTokens();
         const response = await fetch(this.apiUrl, {
             method: 'POST',
             headers: {
@@ -29,7 +30,8 @@ class OpenAIService {
             const completionTokens = data.usage?.completion_tokens ?? '-';
             const promptTokens = data.usage?.prompt_tokens ?? '-';
             const totalTokens = data.usage?.total_tokens ?? '-';
-            return data.choices[0].message.content.trim() + `\n(${gptModel}, tokens prompt:${promptTokens}, completion:${completionTokens}, total:${totalTokens})`;
+            const usedTokensAndModel = !!displayTokens ? `\n(${gptModel}, tokens prompt:${promptTokens}, completion:${completionTokens}, total:${totalTokens})` : '';
+            return data.choices[0].message.content.trim() + usedTokensAndModel;
         } else {
             throw new Error(data.error.message || 'Error fetching data from OpenAI');
         }
