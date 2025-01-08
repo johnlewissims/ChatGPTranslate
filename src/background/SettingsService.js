@@ -66,13 +66,6 @@ class SettingsService {
         return Languages[language] ?? DefaultSettings.Language;
     }
 
-    async getDetailedTranslation() {
-        const { getDetailedTranslation } = await new Promise((resolve) => {
-            chrome.storage.local.get('getDetailedTranslation', resolve);
-        });
-        return !!getDetailedTranslation;
-    }
-
     async getDisplayTokens() {
         const { displayTokens } = await new Promise((resolve) => {
             chrome.storage.local.get('displayTokens', resolve);

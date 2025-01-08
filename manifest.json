@@ -38,6 +38,7 @@
                 "src/icons/icon16.png",
                 "src/icons/icon48.png",
                 "src/icons/icon128.png",
+                "src/icons/iconDetailedTranslation.png",
                 "src/icons/loading-spinner.gif",
                 "src/views/popup.html",
                 "src/views/settings.html",

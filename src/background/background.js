@@ -37,6 +37,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse({ error: error.message });
     });
     return true;
+  } else if (message.action === 'translateDetailed') {
+    OpenAIService.translateText(message.text, message.languageCode, true).then(response => {
+      sendResponse(response);
+    }).catch(error => {
+      sendResponse({ error: error.message });
+    });
+    return true;
   } else if (message.action === 'fetchExplanation') {
     OpenAIService.fetchExplanation(message.text).then(response => {
       sendResponse(response);

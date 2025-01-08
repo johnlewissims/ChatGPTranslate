@@ -75,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
         'language',
         'gptModel',
         'maxTokens',
-        'getDetailedTranslation',
         'getTranslationAsHtml',
         'displayTokens'
     ], function (result) {
@@ -86,7 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
             loadAllGptModels();
         }
         document.getElementById('always-display-explanation').checked = !!result.alwaysDisplayExplanation;
-        document.getElementById('get-detailed-translation').checked = !!result.getDetailedTranslation;
         document.getElementById('get-translation-as-html').checked = !!result.getTranslationAsHtml;
         document.getElementById('language').value = result.language ?? DefaultSettings.language;
         document.getElementById('max-tokens').value = result.maxTokens ?? DefaultSettings.MaxTokens;
@@ -99,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const apiKey = document.getElementById('api-key').value;
         const alwaysDisplayExplanation = document.getElementById('always-display-explanation').checked;
-        const getDetailedTranslation = document.getElementById('get-detailed-translation').checked;
         const getTranslationAsHtml = document.getElementById('get-translation-as-html').checked;
         const language = document.getElementById('language').value;
         if (language.trim() === "") {
@@ -118,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
             gptModel: gptModel,
             alwaysDisplayExplanation: alwaysDisplayExplanation,
             maxTokens: maxTokens,
-            getDetailedTranslation: getDetailedTranslation,
             getTranslationAsHtml: getTranslationAsHtml,
             displayTokens: displayTokens
         }

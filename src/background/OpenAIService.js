@@ -92,10 +92,8 @@ class OpenAIService {
         ];
     }
 
-    async translateText(text, languageCode = '') {
+    async translateText(text, languageCode = '', isDetailedTranslation = false) {
         const language = await SettingsService.getLanguage();
-        const isDetailRequest = this.canRequestDetailDescription(text);
-        const isDetailedTranslation = isDetailRequest && await SettingsService.getDetailedTranslation() ;
         const isTranslationAsHtml = await SettingsService.getTranslationAsHtml();
         const outputBlocksDescription = this.getOutBlocksMessages(language, isDetailedTranslation);
         const languageHint = getLanguageHint(languageCode, language);
