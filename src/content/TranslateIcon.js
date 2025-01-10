@@ -1,3 +1,4 @@
+import { MessageActions } from '../constants/messageActions.js';
 import CursorTracker from './CursorTracker.js';
 import PopupManager from './PopupManager.js';
 
@@ -16,6 +17,19 @@ class TranslateIcon {
     displayIconDetailed() {
         const selectedText = window.getSelection().toString().trim();
         return selectedText && selectedText.length <= this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION
+    }
+
+    getLanguageCode(anchorNode) {
+        // Try to get a language code from the nearest parent.
+        let node = anchorNode;
+        while (!!node) {
+            if (node.lang) {
+                return node.lang;
+            }
+            node = node.parentNode;
+        }
+
+        return document?.documentElement?.lang?.toUpperCase() ?? '';
     }
 
     createIcon() {
@@ -109,21 +123,9 @@ class TranslateIcon {
             this.icon.src = chrome.runtime.getURL('src/icons/icon.png');
             return;
         }
-        // Try to get a language code from the nearest parent.
-        let languageCode = '';
-        let node = selection.anchorNode;
-        while (!!node) {
-            if (node.lang) {
-                languageCode = node.lang;
-                break
-            }
-            node = node.parentNode;
-        }
-        if (languageCode === '') {
-            languageCode = document?.documentElement?.lang?.toUpperCase() ?? '';
-        }
+        const languageCode = this.getLanguageCode(selection.anchorNode);
         const message = {
-            action: 'translateAndExplain',
+            action: MessageActions.translateAndExplain,
             text: selectedText,
             languageCode: languageCode,
         };
@@ -134,7 +136,7 @@ class TranslateIcon {
             } else {
                 this.hide();
                 this.icon.src = chrome.runtime.getURL('src/icons/icon.png');
-                PopupManager.show(response.translation, selectedText);
+                PopupManager.show({ ...message, translation: response.translation });
             }
         });
     }
@@ -153,21 +155,9 @@ class TranslateIcon {
             this.iconDetailed.src = chrome.runtime.getURL('src/icons/iconDetailedTranslation.png');
             return;
         }
-        // Try to get a language code from the nearest parent.
-        let languageCode = '';
-        let node = selection.anchorNode;
-        while (!!node) {
-            if (node.lang) {
-                languageCode = node.lang;
-                break
-            }
-            node = node.parentNode;
-        }
-        if (languageCode === '') {
-            languageCode = document?.documentElement?.lang?.toUpperCase() ?? '';
-        }
+        const languageCode = this.getLanguageCode(selection.anchorNode);
         const message = {
-            action: 'translateDetailed',
+            action: MessageActions.translateDetailed,
             text: selectedText,
             languageCode: languageCode,
         };
@@ -178,7 +168,7 @@ class TranslateIcon {
             } else {
                 this.hide();
                 this.iconDetailed.src = chrome.runtime.getURL('src/icons/iconDetailedTranslation.png');
-                PopupManager.show(response.translation, selectedText);
+                PopupManager.show({ ...message, translation: response.translation });
             }
         });
     }

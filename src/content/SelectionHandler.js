@@ -18,6 +18,9 @@ class SelectionHandler {
                 this.isExtensionContextDestroyed = true;
                 return;
             }
+            if (!window.getSelection().toString().trim()) {
+                return;
+            }
             chrome.storage.local.get('enabled', (data) => {
                 this.selectedText = window.getSelection().toString().trim();
                 if (this.selectedText && data.enabled) {
