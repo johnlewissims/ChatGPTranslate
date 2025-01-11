@@ -1,39 +1,54 @@
 #translation-popup {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: white;
+  --main-bg-color: white;
+  position: fixed;
+  top: 40VH;
+  left: 50VW;
+  transform: translate(-50%, max(-50%, -40VH));
+  background-color: var(--main-bg-color);
   border: 1px solid #ccc;
   border-radius: 10px;
   padding: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  font-family: Arial, sans-serif;
   z-index: 10000;
-  max-width: 300px;
+  max-width : min(calc(70VW), 900px);
 }
 
-#translation-popup p {
-  margin: 0 0 5px;
-}
-
-#translation-popup p strong {
-  font-weight: bold;
-  color: #333;
+#translation-popup,
+#translation-popup h1,
+#translation-popup h2,
+#translation-popup h3,
+#translation-popup p,
+#translation-popup li,
+#translation-popup div,
+#translation-popup pre {
+  color: black;
+  font-size: 16px;
+  margin: 0 0 4px;
+  font-family: Arial, sans-serif;
 }
 
 #translation-popup a {
   text-decoration: underline;
-  font-size: 10px;
+  font-size: .75em;
+}
+
+ #translation-popup .default-color:link {
+  color: LinkText;
 }
 
 #translation-popup a:hover {
   text-decoration: underline;
 }
 
+#translation-popup ol,
+#translation-popup ul {
+  padding:0 0 0 32px;
+}
+
 #translation-popup img {
   cursor: pointer;
-  width: 14px;
-  height: 14px;
+  width: 24px;
+  height: 24px;
   vertical-align: middle;
 }
 
@@ -52,7 +67,9 @@
 }
 
 .translation-section .pronunciation {
-  width: 20px;
+  position: absolute;
+  top:10px;
+  right:10px;
 }
 
 #translation-popup .explanation {
@@ -60,6 +77,18 @@
   color: #666;
 }
 
+#translation-popup .explanation strong {
+  font-weight: bold;
+  color: #333;
+}
+
+#translation-popup pre {
+  width: 100%;
+  text-wrap: auto;
+  background-color: var(--main-bg-color);
+}
+
 .navbar-popup {
-  width: 250px;
+  width: 300px;
+  font-size: 16px;
 }

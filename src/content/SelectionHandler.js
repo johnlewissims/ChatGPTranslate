@@ -3,10 +3,24 @@ import TranslateIcon from './TranslateIcon.js';
 class SelectionHandler {
     constructor() {
         this.selectedText = '';
+        this.isExtensionContextDestroyed = false;
     }
 
     init() {
         document.addEventListener('mouseup', () => {
+            if (this.isExtensionContextDestroyed) {
+                // A user must reload the page to reactivate the extension.
+                return;
+            }
+            try {
+                chrome.storage.local.get('enabled', () => void (0));
+            } catch (error) {
+                this.isExtensionContextDestroyed = true;
+                return;
+            }
+            if (!window.getSelection().toString().trim()) {
+                return;
+            }
             chrome.storage.local.get('enabled', (data) => {
                 this.selectedText = window.getSelection().toString().trim();
                 if (this.selectedText && data.enabled) {

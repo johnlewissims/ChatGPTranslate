@@ -8,18 +8,52 @@
 
 <body>
     <h1>Settings</h1>
-    <p>Please enter your OpenAI API Key below. You can obtain your API key from the <a
-            href="https://platform.openai.com/account/api-keys" target="_blank">OpenAI API Keys page</a>.</p>
     <form id="settings-form">
-        <label for="api-key">OpenAI API Key:</label>
-        <input type="text" id="api-key" name="api-key" required>
+        <div class="item">Please enter your OpenAI API Key below. You can obtain your API key from the <a
+            href="https://platform.openai.com/account/api-keys" target="_blank">OpenAI API Keys page</a>.
+            <br>
+            <label for="api-key">OpenAI API Key:</label>
+            <textarea type="text" id="api-key" name="api-key" rows="3" required></textarea>
+        </div>
+        <div class="item">Please enter your preferred OpenAI model. OpenAI models are listed on the <a href="https://platform.openai.com/docs/models#current-model-aliases" target="_blank">OpenAI Models page</a>.
+            <br>
+            <label for="gpt-model">GPT model:</label>
+            <select id="gpt-model" name="gpt-model" required>
+            </select>
+            <button type="button" id="load-all-gpt-models">Load all GPT models</button>
+        </div>
+        <div class="item">
+        <label for="language">Your language:</label>
+            <select id="language" name="language" required>
+            </select>
+        </div>
+        <div class="item">
+            The maximum number of tokens GPT can use to generate a response. The higher the number set, the more detailed the response will be. Roughly 100 tokens ~ 75 words in English.
+            <br>
+            <label for="max-tokens">Maximum tokens:</label>
+            <input type="number" min="100" max="1000" id="max-tokens" name="max-tokens" required> (from 100 to 1000)
+        </div>
+        <div class="item">
         <label>
             <input type="checkbox" id="always-display-explanation"> Always Display Explanation
         </label>
-        <br><br>
+        </div>
+        <div class="item">
+            This flag only affects requests if the maximum token count is set to at least 300.
+            <br>
+            <label>
+                <input type="checkbox" id="get-translation-as-html">Get a GPT answer in HTML.
+            </label>
+        </div>
+        <div class="item">
+            <label>
+                <input type="checkbox" id="display-tokens">Display GPT Model and used tokens
+            </label>
+        </div>
         <button type="submit">Save</button>
     </form>
-    <script src="../scripts/settings.js"></script>
+    <script type="module" src="../scripts/defaultSettings.js"></script>
+    <script type="module" src="../scripts/settings.js"></script>
 </body>
 
 </html>
