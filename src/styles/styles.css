@@ -27,6 +27,13 @@
   font-family: Arial, sans-serif;
 }
 
+#translation-popup pre {
+  box-shadow:none;
+  border:unset;
+  margin:0;
+  padding:0;
+}
+
 #translation-popup a {
   text-decoration: underline;
   font-size: .75em;
@@ -91,4 +98,10 @@
 .navbar-popup {
   width: 300px;
   font-size: 16px;
+}
+
+#translation-popup .settings-link {
+  position: absolute;
+  right:16px;
+  bottom:16px;
 }

@@ -1,4 +1,4 @@
-import { DefaultSettings, Languages } from './defaultSettings.js'
+import { AllSettingsNames, DefaultSettings, Languages } from './defaultSettings.js'
 
 let gptModelsForOptions = {
     "gpt-4o": 'gpt-4o',
@@ -69,15 +69,7 @@ const loadAllGptModels = async () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Load and display the saved settings if they exist
-    chrome.storage.local.get([
-        'OPENAI_API_KEY',
-        'alwaysDisplayExplanation',
-        'language',
-        'gptModel',
-        'maxTokens',
-        'getTranslationAsHtml',
-        'displayTokens'
-    ], function (result) {
+    chrome.storage.local.get(AllSettingsNames, function (result) {
         const model = document.getElementById('gpt-model');
         model.value = result.gptModel ?? DefaultSettings.gptModel;
         if (result.OPENAI_API_KEY) {

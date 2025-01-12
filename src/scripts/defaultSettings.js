@@ -204,3 +204,13 @@ export const Languages = {
     za:"Zhuang, Chuang",
     zu: "Zulu"
 }
+
+export const AllSettingsNames = [
+    'OPENAI_API_KEY',
+    'alwaysDisplayExplanation',
+    'language',
+    'gptModel',
+    'maxTokens',
+    'getTranslationAsHtml',
+    'displayTokens'
+]

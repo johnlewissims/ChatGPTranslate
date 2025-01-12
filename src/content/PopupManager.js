@@ -11,6 +11,7 @@ class PopupManager {
         explanationLink.classList.add('explanation-link');
         explanationLink.classList.add('default-color');
         explanationLink.textContent = 'See Explanation';
+        explanationLink.title = "Show explanations for selected text"
         explanationLink.addEventListener('click', async (event) => {
             event.preventDefault();
             const explanation = await this.fetchExplanation(text);
@@ -21,6 +22,19 @@ class PopupManager {
         });
 
         return explanationLink;
+    }
+
+    createSettingsLink() {
+        const settingsLink = document.createElement('a');
+        settingsLink.href = '#';
+        settingsLink.classList.add('settings-link');
+        settingsLink.classList.add('default-color');
+        settingsLink.innerHTML = '&#x2699; Settings';
+        settingsLink.title = "Update settings"
+        settingsLink.target = "_blank";
+        settingsLink.href = chrome.runtime.getURL('src/views/settings.html');
+
+        return settingsLink;
     }
 
     async show({ translation, text, action }) {
@@ -56,6 +70,11 @@ class PopupManager {
                 const explanationLink = this.createExplanationLink();
                 popup.appendChild(explanationLink);
             }
+        }
+
+        if (await SettingsService.shouldUserUpdateSettings()) {
+            const settingsLink = this.createSettingsLink();
+            popup.appendChild(settingsLink);
         }
 
         document.body.appendChild(popup);

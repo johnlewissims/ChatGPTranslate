@@ -1,4 +1,4 @@
-import { DefaultSettings , Languages} from '../scripts/defaultSettings'
+import { AllSettingsNames, DefaultSettings , Languages} from '../scripts/defaultSettings'
 
 class SettingsService { 
 
@@ -56,13 +56,9 @@ class SettingsService {
     }
 
     async getLanguage() {
-        const { language } = await new Promise((resolve) => {
-            chrome.storage.local.get('language', resolve);
+        const { language = DefaultSettings.Language } = await new Promise((resolve) => {
+            chrome.storage.local.get('language2', resolve);
         });
-        
-        if (!language) {
-            language = DefaultSettings.Language;
-        }
         return Languages[language] ?? DefaultSettings.Language;
     }
 
@@ -71,6 +67,18 @@ class SettingsService {
             chrome.storage.local.get('displayTokens', resolve);
         });
         return !!displayTokens;
+    }
+
+    async shouldUserUpdateSettings() {
+        const settings = await new Promise((resolve) => {
+            chrome.storage.local.get(AllSettingsNames, resolve);
+        });
+
+        const keyValues = Object.entries(settings);
+        if (keyValues.length !== AllSettingsNames.length) {
+            return true;
+        }
+        return keyValues.find(([_, value]) => value === undefined) !== undefined;
     }
 }
 
