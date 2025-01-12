@@ -1,3 +1,4 @@
+import { ErrorMessages } from '../constants/errorMessages';
 import { DefaultSettings , Languages} from '../scripts/defaultSettings'
 
 class SettingsService { 
@@ -43,7 +44,7 @@ class SettingsService {
         });
 
         if (!OPENAI_API_KEY) {
-            throw new Error('API Key not set');
+            throw new Error(ErrorMessages.APIKeyNotSet);
         }
         return OPENAI_API_KEY;
     }
@@ -56,13 +57,10 @@ class SettingsService {
     }
 
     async getLanguage() {
-        const { language } = await new Promise((resolve) => {
+        const { language = DefaultSettings.Language } = await new Promise((resolve) => {
             chrome.storage.local.get('language', resolve);
         });
         
-        if (!language) {
-            language = DefaultSettings.Language;
-        }
         return Languages[language] ?? DefaultSettings.Language;
     }
 

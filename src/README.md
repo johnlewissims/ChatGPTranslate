@@ -1,4 +1,4 @@
-![ChatGPTranslate](src/icons/icon128.png)
+![ChatGPTranslate](icons/icon128.png)
 # ChatGPTranslate
 ## Description
 [ChatGPTranslate](https://chromewebstore.google.com/detail/chatgptranslate/plokiajdjepgcmhbnbfcehedkiobiakd) is a Chrome extension that allows users to highlight text on any webpage, click an icon to translate the text using OpenAI, and get an explanation of the translated text. It provides a seamless way to understand and interpret foreign language content directly from your browser.
@@ -41,7 +41,7 @@ npm run build
 ### Step 4: Load the Extension in Chrome
 - Open Chrome and go to chrome://extensions/
 - Enable "Developer mode" by toggling the switch in the top right corner
-- Click the "Load unpacked" button and select the directory where you cloned the repository
+- Click the "Load unpacked" button and select the "dist" folder in the directory where you cloned and built the repository
 
 ### Step 5: Configure Your Settings
 - Click on the extension icon in the Chrome toolbar

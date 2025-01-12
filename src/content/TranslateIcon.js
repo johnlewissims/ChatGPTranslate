@@ -1,6 +1,8 @@
 import { MessageActions } from '../constants/messageActions.js';
 import CursorTracker from './CursorTracker.js';
 import PopupManager from './PopupManager.js';
+import SettingsService from '../background/SettingsService.js';
+import { ErrorMessages } from '../constants/errorMessages.js';
 
 class TranslateIcon {
     MAX_LENGTH_TEXT_FOR_TRANSLATION = 500;
@@ -56,7 +58,7 @@ class TranslateIcon {
         const scrollXWithShift = scrollX + 16;
         if (!this.icon) {
             this.icon = this.createIcon();
-            this.icon.src = chrome.runtime.getURL('src/icons/icon.png');
+            this.icon.src = chrome.runtime.getURL('icons/icon.png');
             this.icon.title = 'Translate the selected text';
             this.icon.addEventListener('click', () => this.onClick());
             document.body.appendChild(this.icon);
@@ -73,7 +75,7 @@ class TranslateIcon {
 
         if (!this.iconDetailed) {
             this.iconDetailed = this.createIcon();
-            this.iconDetailed.src = chrome.runtime.getURL('src/icons/iconDetailedTranslation.png');
+            this.iconDetailed.src = chrome.runtime.getURL('icons/iconDetailedTranslation.png');
             this.iconDetailed.title = 'Translate the selected text and provide usage options with examples.';
             this.iconDetailed.addEventListener('click', () => this.onClickDetailed());
             document.body.appendChild(this.iconDetailed);
@@ -109,68 +111,90 @@ class TranslateIcon {
     }
 
     onClick() {
-        this.iconDetailed.style.display = 'none';
-        this.icon.src = chrome.runtime.getURL('src/icons/loading-spinner.gif');
-        const selection = window.getSelection();
-        const selectedText = selection.toString().trim();
-        if (!selectedText) {
-            return;
-        }
-        // if length of selected text is > this.MAX_LENGTH_TEXT_FOR_TRANSLATION, return error
-        if (selectedText.length > this.MAX_LENGTH_TEXT_FOR_TRANSLATION) {
-            alert(`Selected text is too long. Please select less than ${this.MAX_LENGTH_TEXT_FOR_TRANSLATION} characters.`);
-            this.hide();
-            this.icon.src = chrome.runtime.getURL('src/icons/icon.png');
-            return;
-        }
-        const languageCode = this.getLanguageCode(selection.anchorNode);
-        const message = {
-            action: MessageActions.translateAndExplain,
-            text: selectedText,
-            languageCode: languageCode,
-        };
-        chrome.runtime.sendMessage(message, (response) => {
-            if (response.error) {
-                alert('Error fetching translation.');
-                console.error('Error:', response.error);
-            } else {
-                this.hide();
-                this.icon.src = chrome.runtime.getURL('src/icons/icon.png');
-                PopupManager.show({ ...message, translation: response.translation });
+        function getTranslation() {
+            this.iconDetailed.style.display = 'none';
+            this.icon.src = chrome.runtime.getURL('icons/loading-spinner.gif');
+            const selection = window.getSelection();
+            const selectedText = selection.toString().trim();
+            if (!selectedText) {
+                return;
             }
-        });
+            // if length of selected text is > this.MAX_LENGTH_TEXT_FOR_TRANSLATION, return error
+            if (selectedText.length > this.MAX_LENGTH_TEXT_FOR_TRANSLATION) {
+                alert(`Selected text is too long. Please select less than ${this.MAX_LENGTH_TEXT_FOR_TRANSLATION} characters.`);
+                this.hide();
+                this.icon.src = chrome.runtime.getURL('icons/icon.png');
+                return;
+            }
+            const languageCode = this.getLanguageCode(selection.anchorNode);
+            const message = {
+                action: MessageActions.translateAndExplain,
+                text: selectedText,
+                languageCode: languageCode,
+            };
+            chrome.runtime.sendMessage(message, (response) => {
+                if (response.error) {
+                    alert('Error fetching translation.');
+                    console.error('Error:', response.error);
+                } else {
+                    this.hide();
+                    this.icon.src = chrome.runtime.getURL('icons/icon.png');
+                    PopupManager.show({ ...message, translation: response.translation });
+                }
+            });
+        }
+
+        const getTranslationCallBack = getTranslation.bind(this);
+        SettingsService.getAPIKey()
+            .then(() => getTranslationCallBack())
+            .catch((err) => {
+                if (err.message === ErrorMessages.APIKeyNotSet) {
+                    window.open(chrome.runtime.getURL('views/settings.html'), '_blank').focus();
+                }
+            })
     }
 
     onClickDetailed() {
-        this.icon.style.display = 'none';
-        this.iconDetailed.src = chrome.runtime.getURL('src/icons/loading-spinner.gif');
-        const selection = window.getSelection();
-        const selectedText = selection.toString().trim();
-        if (!selectedText) {
-            return;
-        }
-        if (selectedText.length > this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION) {
-            alert(`Selected text is too long. Please select less than ${this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION} characters.`);
-            this.hide();
-            this.iconDetailed.src = chrome.runtime.getURL('src/icons/iconDetailedTranslation.png');
-            return;
-        }
-        const languageCode = this.getLanguageCode(selection.anchorNode);
-        const message = {
-            action: MessageActions.translateDetailed,
-            text: selectedText,
-            languageCode: languageCode,
-        };
-        chrome.runtime.sendMessage(message, (response) => {
-            if (response.error) {
-                alert('Error fetching translation.');
-                console.error('Error:', response.error);
-            } else {
-                this.hide();
-                this.iconDetailed.src = chrome.runtime.getURL('src/icons/iconDetailedTranslation.png');
-                PopupManager.show({ ...message, translation: response.translation });
+        function getTranslation() {
+            this.icon.style.display = 'none';
+            this.iconDetailed.src = chrome.runtime.getURL('icons/loading-spinner.gif');
+            const selection = window.getSelection();
+            const selectedText = selection.toString().trim();
+            if (!selectedText) {
+                return;
             }
-        });
+            if (selectedText.length > this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION) {
+                alert(`Selected text is too long. Please select less than ${this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION} characters.`);
+                this.hide();
+                this.iconDetailed.src = chrome.runtime.getURL('icons/iconDetailedTranslation.png');
+                return;
+            }
+            const languageCode = this.getLanguageCode(selection.anchorNode);
+            const message = {
+                action: MessageActions.translateDetailed,
+                text: selectedText,
+                languageCode: languageCode,
+            };
+            chrome.runtime.sendMessage(message, (response) => {
+                if (response.error) {
+                    alert('Error fetching translation.');
+                    console.error('Error:', response.error);
+                } else {
+                    this.hide();
+                    this.iconDetailed.src = chrome.runtime.getURL('icons/iconDetailedTranslation.png');
+                    PopupManager.show({ ...message, translation: response.translation });
+                }
+            });
+        }
+
+        const getTranslationCallBack = getTranslation.bind(this);
+        SettingsService.getAPIKey()
+            .then(() => getTranslationCallBack())
+            .catch((err) => {
+                if (err.message === ErrorMessages.APIKeyNotSet) {
+                    window.open(chrome.runtime.getURL('views/settings.html'), '_blank').focus();
+                }
+            })
     }
 }
 

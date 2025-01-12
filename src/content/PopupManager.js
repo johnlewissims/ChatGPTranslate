@@ -39,7 +39,7 @@ class PopupManager {
                 </p>
             </div>
             <div class="pronunciation">
-                <img src="${chrome.runtime.getURL('src/icons/speaker.png')}" alt="Play translation" id="ttsIcon">
+                <img src="${chrome.runtime.getURL('icons/speaker.png')}" alt="Play translation" id="ttsIcon">
             </div>
         `;
         
