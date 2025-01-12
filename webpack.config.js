@@ -41,8 +41,6 @@ module.exports = {
         new CopyPlugin({
         patterns: [
             { from: `${sourcePath}/manifest.json`, to: `${buildPath}/` },
-            { from: `${sourcePath}/privacy.md`, to: `${buildPath}/` },
-            { from: `${sourcePath}/readme.md`, to: `${buildPath}/` },
             { from: `${sourcePath}/views`, to: `${buildPath}/views` },
             { from: `${sourcePath}/icons`, to: `${buildPath}/icons` },
             { from: `${sourcePath}/scripts`, to: `${buildPath}/scripts` },
