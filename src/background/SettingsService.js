@@ -57,7 +57,7 @@ class SettingsService {
 
     async getLanguage() {
         const { language = DefaultSettings.Language } = await new Promise((resolve) => {
-            chrome.storage.local.get('language2', resolve);
+            chrome.storage.local.get('language', resolve);
         });
         return Languages[language] ?? DefaultSettings.Language;
     }
