@@ -1,14 +1,20 @@
 const path = require('path');
 
+const buildPath = path.resolve(__dirname, 'dist');
+const sourcePath = path.resolve(__dirname, 'src');
+
+const CopyPlugin = require("copy-webpack-plugin");
+
 module.exports = {
     mode: 'production',
     entry: {
-        background: './src/background/background.js',
-        content: './src/content/content.js'
+        background: `${sourcePath}/background/background.js`,
+        content: `${sourcePath}/content/content.js`
     },
     output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: '[name].bundle.js'
+        path: buildPath,
+        filename: '[name].bundle.js',
+        clean: true,
     },
     module: {
         rules: [
@@ -30,5 +36,16 @@ module.exports = {
     },
     resolve: {
         extensions: ['.js']
-    }
+    },
+    plugins: [
+        new CopyPlugin({
+        patterns: [
+            { from: `${sourcePath}/manifest.json`, to: `${buildPath}/` },
+            { from: `${sourcePath}/views`, to: `${buildPath}/views` },
+            { from: `${sourcePath}/icons`, to: `${buildPath}/icons` },
+            { from: `${sourcePath}/scripts`, to: `${buildPath}/scripts` },
+            { from: `${sourcePath}/styles`, to: `${buildPath}/styles` },
+            ],
+        }),
+    ],
 };

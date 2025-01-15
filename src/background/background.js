@@ -33,21 +33,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   } else if (message.action === MessageActions.translateAndExplain) {
     OpenAIService.translateText(message.text, message.languageCode).then(response => {
-      sendResponse(response);
+      sendResponse({ ...response, text: message.text, action: message.action });
     }).catch(error => {
       sendResponse({ error: error.message });
     });
     return true;
   } else if (message.action === MessageActions.translateDetailed) {
     OpenAIService.translateText(message.text, message.languageCode, true).then(response => {
-      sendResponse(response);
+      sendResponse({ ...response, text: message.text, action: message.action });
     }).catch(error => {
       sendResponse({ error: error.message });
     });
     return true;
   } else if (message.action === MessageActions.fetchExplanation) {
     OpenAIService.fetchExplanation(message.text).then(response => {
-      sendResponse(response);
+      sendResponse({ ...response, text: message.text, action: message.action });
     }).catch(error => {
       sendResponse({ error: error.message });
     });

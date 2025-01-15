@@ -120,6 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         chrome.storage.local.set(values, function () {
             alert('Settings saved successfully!');
+            if (event.submitter.id === "save-and-close") {
+                window.close();
+            }
         });
     });
 

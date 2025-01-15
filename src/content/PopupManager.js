@@ -1,11 +1,12 @@
 import SettingsService from '../background/SettingsService.js';
+import TranslationService from '../background/TranslationService.js';
 import { MessageActions } from '../constants/messageActions.js';
 import '../styles/styles.css'; 
 
 import TranslateIcon from './TranslateIcon.js';
 
 class PopupManager {
-    createExplanationLink() {
+    createExplanationLink(text, popup) {
         const explanationLink = document.createElement('a');
         explanationLink.href = '#';
         explanationLink.classList.add('explanation-link');
@@ -39,7 +40,7 @@ class PopupManager {
                 </p>
             </div>
             <div class="pronunciation">
-                <img src="${chrome.runtime.getURL('src/icons/speaker.png')}" alt="Play translation" id="ttsIcon">
+                <img src="${chrome.runtime.getURL('icons/speaker.png')}" alt="Play translation" id="ttsIcon">
             </div>
         `;
         
@@ -53,7 +54,7 @@ class PopupManager {
                 const explanation = await this.fetchExplanation(text);
                 popup.innerHTML += `<div class="explanation"><p><strong>Explanation:</strong> ${explanation}</p></div>`;
             } else {
-                const explanationLink = this.createExplanationLink();
+                const explanationLink = this.createExplanationLink(text, popup);
                 popup.appendChild(explanationLink);
             }
         }
@@ -73,7 +74,7 @@ class PopupManager {
 
     async fetchExplanation(text) {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ action: MessageActions.fetchExplanation, text: text }, (response) => {
+            TranslationService.handleTranslation(MessageActions.fetchExplanation, text, '', (response) => {
                 if (response.error) {
                     reject(response.error);
                 } else {
@@ -85,7 +86,7 @@ class PopupManager {
 
     async playTextToSpeech(text) {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ action: MessageActions.textToSpeech, text: text }, (response) => {
+            TranslationService.handleTranslation(MessageActions.textToSpeech, text,'', (response) => {
                 if (response.error) {
                     reject(response.error);
                 } else {
