@@ -1,4 +1,5 @@
 import TranslateIcon from './TranslateIcon.js';
+import SelectionService from '../background/SelectionService.js';
 
 class SelectionHandler {
     constructor() {
@@ -18,11 +19,11 @@ class SelectionHandler {
                 this.isExtensionContextDestroyed = true;
                 return;
             }
-            if (!window.getSelection().toString().trim()) {
+            if (!SelectionService.getSelectedText()) {
                 return;
             }
             chrome.storage.local.get('enabled', (data) => {
-                this.selectedText = window.getSelection().toString().trim();
+                this.selectedText = SelectionService.getSelectedText();
                 if (this.selectedText && data.enabled) {
                     TranslateIcon.show();
                 } else {
