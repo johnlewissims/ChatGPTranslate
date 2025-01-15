@@ -1,4 +1,4 @@
-![ChatGPTranslate](icons/icon128.png)
+![ChatGPTranslate](src/icons/icon128.png)
 # ChatGPTranslate
 ## Description
 [ChatGPTranslate](https://chromewebstore.google.com/detail/chatgptranslate/plokiajdjepgcmhbnbfcehedkiobiakd) is a Chrome extension that allows users to highlight text on any webpage, click an icon to translate the text using OpenAI, and get an explanation of the translated text. It provides a seamless way to understand and interpret foreign language content directly from your browser.
