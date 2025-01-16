@@ -1,5 +1,5 @@
 body {
-  font-size: 16px;
+    font-size: 16px;
 }
 
 .item {
@@ -18,9 +18,9 @@ button {
     padding: 4px 16px;
 }
 
-textarea[name="api-key"] {
-    min-width:300px;
-    margin-top: .5rem;
+textarea[name='api-key'] {
+    min-width: 300px;
+    margin-top: 0.5rem;
     box-sizing: border-box;
 }
 

@@ -14,8 +14,8 @@ class SelectionHandler {
                 return;
             }
             try {
-                chrome.storage.local.get('enabled', () => void (0));
-            } catch (error) {
+                chrome.storage.local.get('enabled', () => void 0);
+            } catch {
                 this.isExtensionContextDestroyed = true;
                 return;
             }
@@ -33,7 +33,10 @@ class SelectionHandler {
         });
 
         document.addEventListener('mousedown', (event) => {
-            if (TranslateIcon.isVisible() && !TranslateIcon.contains(event.target)) {
+            if (
+                TranslateIcon.isVisible() &&
+                !TranslateIcon.contains(event.target)
+            ) {
                 TranslateIcon.hide();
             }
         });

@@ -10,7 +10,11 @@ class CursorTracker {
     }
 
     getPosition() {
-        return { ...this.cursorPosition, scrollX: window.scrollX, scrollY: window.scrollY };
+        return {
+            ...this.cursorPosition,
+            scrollX: window.scrollX,
+            scrollY: window.scrollY,
+        };
     }
 }
 

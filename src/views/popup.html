@@ -1,24 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+    <head>
+        <title>ChatGPTranslate</title>
+        <link rel="stylesheet" href="../styles/styles.css" />
+    </head>
 
-<head>
-    <title>ChatGPTranslate</title>
-    <link rel="stylesheet" href="../styles/styles.css">
-</head>
-
-<body>
-    <div class="navbar-popup">
-        <p id="instruction-key" style="display: none;">
-            Please set your OpenAI API Key in the <a class="settings-link" href="#" target="_blank"><b>Settings</b></a> page.
-        </p>
-        <p id="instruction-general" style="display: none;">
-            Highlight text to use the translation tool. For more options, see the <a class="settings-link" href="#" target="_blank"><b>Settings</b></a> page.
-        </p>
-        <label>
-            <input type="checkbox" id="enable-disable" checked> Enable / Disable
-        </label>
-    </div>
-    <script src="../scripts/popup.js"></script>
-</body>
-
+    <body>
+        <div class="navbar-popup">
+            <p id="instruction-key" style="display: none">
+                Please set your OpenAI API Key in the
+                <a class="settings-link" href="#" target="_blank"
+                    ><b>Settings</b></a
+                >
+                page.
+            </p>
+            <p id="instruction-general" style="display: none">
+                Highlight text to use the translation tool. For more options,
+                see the
+                <a class="settings-link" href="#" target="_blank"
+                    ><b>Settings</b></a
+                >
+                page.
+            </p>
+            <label>
+                <input type="checkbox" id="enable-disable" checked /> Enable /
+                Disable
+            </label>
+        </div>
+        <script src="../scripts/popup.js"></script>
+    </body>
 </html>

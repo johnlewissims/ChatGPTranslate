@@ -4,4 +4,4 @@ export const MessageActions = {
     fetchExplanation: 'fetchExplanation',
     textToSpeech: 'textToSpeech',
     showPopup: 'showPopup',
-}
+};

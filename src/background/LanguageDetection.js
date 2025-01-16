@@ -1,10 +1,10 @@
-import { Languages} from '../scripts/defaultSettings'
+import { Languages } from '../scripts/defaultSettings';
 
 const getLanguageHint = (languageCode = '', targetLanguage = '') => {
     if (!languageCode) {
-        return ''
+        return '';
     }
-    let codeOnly = ''
+    let codeOnly = '';
     if (languageCode.length === 2) {
         codeOnly = languageCode.toLocaleLowerCase();
     } else if (languageCode.indexOf('-') >= 0) {
@@ -13,13 +13,16 @@ const getLanguageHint = (languageCode = '', targetLanguage = '') => {
     if (codeOnly) {
         const language = Languages[codeOnly];
         if (language) {
-            if (language.toLocaleLowerCase() === targetLanguage.toLocaleLowerCase()) {
-                return ''
+            if (
+                language.toLocaleLowerCase() ===
+                targetLanguage.toLocaleLowerCase()
+            ) {
+                return '';
             }
             return language;
         }
     }
     return '';
-}
+};
 
-export { getLanguageHint }
+export { getLanguageHint };

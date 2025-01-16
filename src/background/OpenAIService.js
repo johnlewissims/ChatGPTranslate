@@ -11,18 +11,18 @@ class OpenAIService {
         const gptModel = await SettingsService.getGptModel();
         const apiKey = await SettingsService.getAPIKey();
         const maxTokens = await SettingsService.getMaxTokens();
-        const displayTokens = await SettingsService.getDisplayTokens();
+        const displayTokens = !!(await SettingsService.getDisplayTokens());
         const response = await fetch(this.apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                Authorization: `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
                 model: gptModel,
                 messages: messages,
-                max_tokens: maxTokens
-            })
+                max_tokens: maxTokens,
+            }),
         });
 
         const data = await response.json();
@@ -30,10 +30,14 @@ class OpenAIService {
             const completionTokens = data.usage?.completion_tokens ?? '-';
             const promptTokens = data.usage?.prompt_tokens ?? '-';
             const totalTokens = data.usage?.total_tokens ?? '-';
-            const usedTokensAndModel = !!displayTokens ? `\n(${gptModel}, tokens prompt:${promptTokens}, completion:${completionTokens}, total:${totalTokens})` : '';
+            const usedTokensAndModel = displayTokens
+                ? `\n(${gptModel}, tokens prompt:${promptTokens}, completion:${completionTokens}, total:${totalTokens})`
+                : '';
             return data.choices[0].message.content.trim() + usedTokensAndModel;
         } else {
-            throw new Error(data.error.message || 'Error fetching data from OpenAI');
+            throw new Error(
+                data.error.message || 'Error fetching data from OpenAI',
+            );
         }
     }
 
@@ -43,13 +47,13 @@ class OpenAIService {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                Authorization: `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
                 model: 'tts-1',
                 voice: 'alloy',
-                input: text
-            })
+                input: text,
+            }),
         });
 
         if (!response.ok) {
@@ -75,62 +79,100 @@ class OpenAIService {
     getOutBlocksMessages(language, isDetailedTranslation = false) {
         if (isDetailedTranslation) {
             return [
-                {role:"user", content: "Output must contain 4 blocks."},
-                {role:"user", content: "1: Detected language." },
-                {role:"user", content: `2: Translation to ${language}.` },
-                {role:"user", content: `3: Description of the options for using the text in ${language}.` },
-                {role:"user", content: `4: Three examples with text in detected language with translation to ${language}.` },
-                {role:"user", content: `Block headers must be in ${language}}.` }
+                { role: 'user', content: 'Output must contain 4 blocks.' },
+                { role: 'user', content: '1: Detected language.' },
+                { role: 'user', content: `2: Translation to ${language}.` },
+                {
+                    role: 'user',
+                    content: `3: Description of the options for using the text in ${language}.`,
+                },
+                {
+                    role: 'user',
+                    content: `4: Three examples with text in detected language with translation to ${language}.`,
+                },
+                {
+                    role: 'user',
+                    content: `Block headers must be in ${language}}.`,
+                },
             ];
         }
 
         return [
-            {role:"user", content:"Output must contain 2 blocks."},
-            {role:"user", content: "1: Detected language." },
-            {role:"user", content: `2: Translation to ${language}}.` },
-            {role:"user", content: `Block headers must be in ${language}}.` }
+            { role: 'user', content: 'Output must contain 2 blocks.' },
+            { role: 'user', content: '1: Detected language.' },
+            { role: 'user', content: `2: Translation to ${language}}.` },
+            { role: 'user', content: `Block headers must be in ${language}}.` },
         ];
     }
 
-    async translateText(text, languageCode = '', isDetailedTranslation = false) {
+    async translateText(
+        text,
+        languageCode = '',
+        isDetailedTranslation = false,
+    ) {
         const language = await SettingsService.getLanguage();
-        const isTranslationAsHtml = await SettingsService.getTranslationAsHtml();
-        const outputBlocksDescription = this.getOutBlocksMessages(language, isDetailedTranslation);
+        const isTranslationAsHtml =
+            await SettingsService.getTranslationAsHtml();
+        const outputBlocksDescription = this.getOutBlocksMessages(
+            language,
+            isDetailedTranslation,
+        );
         const languageHint = getLanguageHint(languageCode, language);
-        const languageHintMessage = languageHint ? [{ role: 'user', content: `I think this text in ${languageHint} language.` }] : [];
+        const languageHintMessage = languageHint
+            ? [
+                  {
+                      role: 'user',
+                      content: `I think this text in ${languageHint} language.`,
+                  },
+              ]
+            : [];
         const messages = [
-            { role: 'system', content: 'You are a helpful assistant that translates text.' },
+            {
+                role: 'system',
+                content: 'You are a helpful assistant that translates text.',
+            },
             { role: 'system', content: `User language is ${language}.` },
             { role: 'system', content: 'Detect text language.' },
             ...languageHintMessage,
-            { role:"user", content: `Output must be in ${language}.`},
+            { role: 'user', content: `Output must be in ${language}.` },
             ...outputBlocksDescription,
-            { role: 'user', content: `Text:\n\n"${text}"` }
+            { role: 'user', content: `Text:\n\n"${text}"` },
         ];
 
         if (isTranslationAsHtml) {
-            messages.push({ role: "user", content: `Output must be in HTML without <head> and <body> tags.` });
+            messages.push({
+                role: 'user',
+                content: `Output must be in HTML without <head> and <body> tags.`,
+            });
         }
         let result = await this.callOpenAI(messages);
         if (!isTranslationAsHtml) {
-            return { translation: `<pre>${result}</pre>` || "Translation not available" };
-        }
-        else if (result.startsWith('```html')) {
-            result = result.replace("```html\n", "").replace("\n```", "\n");
+            return {
+                translation: `<pre>${result || 'Translation not available'}</pre>`,
+            };
+        } else if (result.startsWith('```html')) {
+            result = result.replace('```html\n', '').replace('\n```', '\n');
         }
 
-        return { translation: result || "Translation not available" };
+        return { translation: result || 'Translation not available' };
     }
 
     async fetchExplanation(text) {
         const language = await SettingsService.getLanguage();
 
         const messages = [
-            { role: 'system', content: 'You are a helpful assistant that provides explanations.' },
-            { role: 'user', content: `Provide a short explanation for the following text in ${language}: \n\n"${text}"` }
+            {
+                role: 'system',
+                content:
+                    'You are a helpful assistant that provides explanations.',
+            },
+            {
+                role: 'user',
+                content: `Provide a short explanation for the following text in ${language}: \n\n"${text}"`,
+            },
         ];
         const result = await this.callOpenAI(messages);
-        return { explanation: result || "Explanation not available" };
+        return { explanation: result || 'Explanation not available' };
     }
 }
 

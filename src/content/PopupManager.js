@@ -1,7 +1,7 @@
 import SettingsService from '../background/SettingsService.js';
 import TranslationService from '../background/TranslationService.js';
 import { MessageActions } from '../constants/messageActions.js';
-import '../styles/styles.css'; 
+import '../styles/styles.css';
 
 import TranslateIcon from './TranslateIcon.js';
 
@@ -43,13 +43,14 @@ class PopupManager {
                 <img src="${chrome.runtime.getURL('icons/speaker.png')}" alt="Play translation" id="ttsIcon">
             </div>
         `;
-        
+
         const ttsIcon = translationSection.querySelector('#ttsIcon');
         ttsIcon.addEventListener('click', () => this.playTextToSpeech(text));
         popup.appendChild(translationSection);
 
         if (action !== MessageActions.translateDetailed) {
-            const  alwaysDisplayExplanation  = await SettingsService.getAlwaysDisplayExplanation();
+            const alwaysDisplayExplanation =
+                await SettingsService.getAlwaysDisplayExplanation();
             if (alwaysDisplayExplanation) {
                 const explanation = await this.fetchExplanation(text);
                 popup.innerHTML += `<div class="explanation"><p><strong>Explanation:</strong> ${explanation}</p></div>`;
@@ -62,7 +63,11 @@ class PopupManager {
         document.body.appendChild(popup);
 
         const hidePopup = (event) => {
-            if (popup && !popup.contains(event.target) && event.target !== TranslateIcon.icon) {
+            if (
+                popup &&
+                !popup.contains(event.target) &&
+                event.target !== TranslateIcon.icon
+            ) {
                 popup.remove();
                 TranslateIcon.hide();
                 document.removeEventListener('mousedown', hidePopup);
@@ -74,27 +79,37 @@ class PopupManager {
 
     async fetchExplanation(text) {
         return new Promise((resolve, reject) => {
-            TranslationService.handleTranslation(MessageActions.fetchExplanation, text, '', (response) => {
-                if (response.error) {
-                    reject(response.error);
-                } else {
-                    resolve(response.explanation);
-                }
-            });
+            TranslationService.handleTranslation(
+                MessageActions.fetchExplanation,
+                text,
+                '',
+                (response) => {
+                    if (response.error) {
+                        reject(response.error);
+                    } else {
+                        resolve(response.explanation);
+                    }
+                },
+            );
         });
     }
 
     async playTextToSpeech(text) {
         return new Promise((resolve, reject) => {
-            TranslationService.handleTranslation(MessageActions.textToSpeech, text,'', (response) => {
-                if (response.error) {
-                    reject(response.error);
-                } else {
-                    const audio = new Audio(response.audioDataUrl);
-                    audio.play();
-                    resolve();
-                }
-            });
+            TranslationService.handleTranslation(
+                MessageActions.textToSpeech,
+                text,
+                '',
+                (response) => {
+                    if (response.error) {
+                        reject(response.error);
+                    } else {
+                        const audio = new Audio(response.audioDataUrl);
+                        audio.play();
+                        resolve();
+                    }
+                },
+            );
         });
     }
 }

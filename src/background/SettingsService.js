@@ -1,12 +1,13 @@
 import { ErrorMessages } from '../constants/errorMessages';
-import { DefaultSettings , Languages} from '../scripts/defaultSettings'
+import { DefaultSettings, Languages } from '../scripts/defaultSettings';
 
-class SettingsService { 
-
+class SettingsService {
     async getGptModel() {
-        const { gptModel = DefaultSettings.GptModel } = await new Promise((resolve) => {
-            chrome.storage.local.get(['gptModel'], resolve);
-        });
+        const { gptModel = DefaultSettings.GptModel } = await new Promise(
+            (resolve) => {
+                chrome.storage.local.get(['gptModel'], resolve);
+            },
+        );
         return gptModel;
     }
 
@@ -19,7 +20,7 @@ class SettingsService {
             return DefaultSettings.MaxTokens;
         }
         if (Number(maxTokens) >= 100) {
-            return Number(maxTokens)
+            return Number(maxTokens);
         }
         return DefaultSettings.MaxTokens;
     }
@@ -32,7 +33,7 @@ class SettingsService {
         if (!getTranslationAsHtml) {
             return false;
         }
-        const maxTokens  = await this.getMaxTokens()
+        const maxTokens = await this.getMaxTokens();
         // If max_tokens is set to a value less than 300,
         // then generating HTML tags significantly reduces the quality of the response.
         return maxTokens >= DefaultSettings.MinTokensForHtmlAnswers;
@@ -57,10 +58,12 @@ class SettingsService {
     }
 
     async getLanguage() {
-        const { language = DefaultSettings.Language } = await new Promise((resolve) => {
-            chrome.storage.local.get('language', resolve);
-        });
-        
+        const { language = DefaultSettings.Language } = await new Promise(
+            (resolve) => {
+                chrome.storage.local.get('language', resolve);
+            },
+        );
+
         return Languages[language] ?? DefaultSettings.Language;
     }
 
