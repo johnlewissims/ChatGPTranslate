@@ -14,10 +14,10 @@ class TranslateIcon {
     CustomIconAttributes = {
         iconUrl: 'data-icon-url',
         iconLoaderUrl: 'data-icon-loader-url',
-    }
+    };
 
     get icons() {
-        return [this.icon, this.iconDetailed]
+        return [this.icon, this.iconDetailed];
     }
 
     constructor() {
@@ -25,27 +25,31 @@ class TranslateIcon {
         this.iconDetailed = null;
     }
 
-    init() { }
+    init() {}
 
     updateIconAndHideAnother(selectedIcon) {
-        this.icons.map(icon => {
+        this.icons.map((icon) => {
             if (icon === selectedIcon) {
-                const iconLoaderUrl = icon.getAttribute(this.CustomIconAttributes.iconLoaderUrl);
+                const iconLoaderUrl = icon.getAttribute(
+                    this.CustomIconAttributes.iconLoaderUrl,
+                );
                 icon.src = chrome.runtime.getURL(iconLoaderUrl);
             } else if (icon) {
                 icon.style.display = 'none';
             }
-        })
+        });
     }
 
     resetIcons() {
-        this.icons.map(icon => {
+        this.icons.map((icon) => {
             if (!icon) {
                 return;
             }
-            const iconUrl = icon.getAttribute(this.CustomIconAttributes.iconUrl);
+            const iconUrl = icon.getAttribute(
+                this.CustomIconAttributes.iconUrl,
+            );
             icon.src = chrome.runtime.getURL(iconUrl);
-        })
+        });
     }
 
     translationResponseHandler(response) {
@@ -55,13 +59,20 @@ class TranslateIcon {
         } else {
             this.hide();
             this.resetIcons();
-            PopupManager.show({ translation: response.translation, text: response.text, action: response.action });
+            PopupManager.show({
+                translation: response.translation,
+                text: response.text,
+                action: response.action,
+            });
         }
     }
 
     displayIconDetailed() {
         const selectedText = SelectionService.getSelectedText();
-        return selectedText && selectedText.length <= this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION
+        return (
+            selectedText &&
+            selectedText.length <= this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION
+        );
     }
 
     createIcon(iconUrl) {
@@ -82,7 +93,10 @@ class TranslateIcon {
     }
 
     show() {
-        if (this.icon?.style?.display === 'block' || this.iconDetailed?.style?.display === 'block') {
+        if (
+            this.icon?.style?.display === 'block' ||
+            this.iconDetailed?.style?.display === 'block'
+        ) {
             // It's a call triggered by the onClick event of one of the icons.
             return;
         }
@@ -92,8 +106,13 @@ class TranslateIcon {
         if (!this.icon) {
             this.icon = this.createIcon('icons/icon.png');
             this.icon.title = 'Translate the selected text';
-            this.icon.addEventListener('click',
-                () => this.onClick(this.icon, this.MAX_LENGTH_TEXT_FOR_TRANSLATION, MessageActions.translateAndExplain));
+            this.icon.addEventListener('click', () =>
+                this.onClick(
+                    this.icon,
+                    this.MAX_LENGTH_TEXT_FOR_TRANSLATION,
+                    MessageActions.translateAndExplain,
+                ),
+            );
             document.body.appendChild(this.icon);
             this.icon.style.top = `${y + scrollY}px`;
             this.icon.style.left = `${x + scrollXWithShift}px`;
@@ -107,10 +126,18 @@ class TranslateIcon {
         this.icon.style.display = 'block';
 
         if (!this.iconDetailed) {
-            this.iconDetailed = this.createIcon('icons/iconDetailedTranslation.png');
-            this.iconDetailed.title = 'Translate the selected text and provide usage options with examples.';
-            this.iconDetailed.addEventListener('click',
-                () => this.onClick(this.iconDetailed, this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION, MessageActions.translateDetailed));
+            this.iconDetailed = this.createIcon(
+                'icons/iconDetailedTranslation.png',
+            );
+            this.iconDetailed.title =
+                'Translate the selected text and provide usage options with examples.';
+            this.iconDetailed.addEventListener('click', () =>
+                this.onClick(
+                    this.iconDetailed,
+                    this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION,
+                    MessageActions.translateDetailed,
+                ),
+            );
             document.body.appendChild(this.iconDetailed);
             this.iconDetailed.style.top = `${y + scrollY}px`;
             this.iconDetailed.style.left = `${x + this.ROW_GAP_BETWEEN_ICONS + scrollXWithShift}px`;
@@ -139,36 +166,52 @@ class TranslateIcon {
     }
 
     contains(target) {
-        return (this.icon && this.icon.contains(target)) ||
-            (this.iconDetailed && this.iconDetailed.contains(target));
+        return (
+            (this.icon && this.icon.contains(target)) ||
+            (this.iconDetailed && this.iconDetailed.contains(target))
+        );
     }
 
     async onClick(icon, maxTextLength, action) {
-        const isAPIKeyValid = !!await SettingsService.getAPIKey()
-            .catch((err) => {
+        const isAPIKeyValid = !!(await SettingsService.getAPIKey().catch(
+            (err) => {
                 if (err.message === ErrorMessages.APIKeyNotSet) {
-                    window.open(chrome.runtime.getURL('views/settings.html'), '_blank').focus();
+                    window
+                        .open(
+                            chrome.runtime.getURL('views/settings.html'),
+                            '_blank',
+                        )
+                        .focus();
                 } else if (err.message) {
-                    alert(err.message)
+                    alert(err.message);
                 }
-            })
+            },
+        ));
         if (!isAPIKeyValid) {
             return;
         }
-        
+
         this.updateIconAndHideAnother(icon);
-        const { selectedText, languageCode } = SelectionService.getSelectedTextAndLanguageCode();
+        const { selectedText, languageCode } =
+            SelectionService.getSelectedTextAndLanguageCode();
         if (!selectedText) {
             return;
         }
         if (selectedText.length > maxTextLength) {
-            alert(`Selected text is too long. Please select less than ${maxTextLength} characters.`);
+            alert(
+                `Selected text is too long. Please select less than ${maxTextLength} characters.`,
+            );
             this.hide();
             this.resetIcons();
             return;
         }
         const callbackTranslation = this.translationResponseHandler.bind(this);
-        TranslationService.handleTranslation(action, selectedText, languageCode, callbackTranslation)
+        TranslationService.handleTranslation(
+            action,
+            selectedText,
+            languageCode,
+            callbackTranslation,
+        );
     }
 }
 

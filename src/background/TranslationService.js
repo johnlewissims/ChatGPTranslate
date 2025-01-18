@@ -1,5 +1,4 @@
 class TranslationService {
-
     /**
      * Get translation.
      * @param {MessageActions} action
