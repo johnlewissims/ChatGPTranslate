@@ -1,4 +1,10 @@
 class SelectionService {
+    /**
+     * Get language code from HTML.
+     *
+     * @param {Node | null} anchorNode
+     * @returns {string}
+     */
     getLanguageCode(anchorNode) {
         // Try to get a language code from the nearest parent.
         let node = anchorNode;
@@ -11,6 +17,11 @@ class SelectionService {
         return document?.documentElement?.lang?.toUpperCase() ?? '';
     }
 
+    /**
+     * Get selected text from web page.
+     *
+     * @returns {string | undefined}
+     */
     getSelectedText() {
         const selection = window.getSelection();
         const selectedText = selection?.toString().trim();

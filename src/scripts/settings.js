@@ -1,3 +1,4 @@
+import { clearAllChild, createOptions } from '../HtmlFunc/options.js';
 import { DefaultSettings, Languages } from './defaultSettings.js';
 
 let gptModelsForOptions = {
@@ -12,31 +13,6 @@ const updateGptModelAttributeDisabled = () => {
             'disabled',
             Object.keys(gptModelsForOptions).length === 0,
         );
-};
-
-const createOptions = (selectElementId, optionsAsObjectWithKeyValue) => {
-    const selectElement = document.getElementById(selectElementId);
-    if (!selectElement) {
-        return;
-    }
-
-    for (const pair of Object.entries(optionsAsObjectWithKeyValue)) {
-        const option = document.createElement('option');
-        option.value = pair[0];
-        option.text = pair[1];
-        selectElement.appendChild(option);
-    }
-};
-
-const clearAllChild = (selectElementId) => {
-    const selectElement = document.getElementById(selectElementId);
-    if (!selectElement) {
-        return;
-    }
-
-    while (selectElement.firstChild) {
-        selectElement.firstChild.remove();
-    }
 };
 
 const loadAllGptModels = async () => {

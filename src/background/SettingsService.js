@@ -2,6 +2,12 @@ import { ErrorMessages } from '../constants/errorMessages';
 import { DefaultSettings, Languages } from '../scripts/defaultSettings';
 
 class SettingsService {
+    /** Settings used by extension
+     * but users can't set them directly on Settings page.*/
+    innerSettings = {
+        popupFavoriteLanguages: 'popupFavoriteLanguages',
+    };
+
     async getGptModel() {
         const { gptModel = DefaultSettings.GptModel } = await new Promise(
             (resolve) => {
@@ -72,6 +78,35 @@ class SettingsService {
             chrome.storage.local.get('displayTokens', resolve);
         });
         return !!displayTokens;
+    }
+
+    async getPopupFavoriteLanguages() {
+        const savedValues = await new Promise((resolve) => {
+            chrome.storage.local.get(
+                this.innerSettings.popupFavoriteLanguages,
+                resolve,
+            );
+        });
+
+        return savedValues[this.innerSettings.popupFavoriteLanguages] ?? {};
+    }
+
+    /**
+     * Add new language into saved settings.
+     *
+     * @param {string} language language code, key of Languages.
+     * @returns
+     */
+    async savePopupFavoriteLanguages(language) {
+        if (!language) {
+            return;
+        }
+        const savedLanguages = await this.getPopupFavoriteLanguages();
+        savedLanguages[language] = 1 + (savedLanguages[language] ?? 0);
+        chrome.storage.local.set(
+            { [this.innerSettings.popupFavoriteLanguages]: savedLanguages },
+            () => void 0,
+        );
     }
 }
 

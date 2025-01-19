@@ -1,17 +1,14 @@
 class TranslationService {
     /**
      * Get translation.
-     * @param {MessageActions} action
-     * @param {string} text
-     * @param {keyof Languages} languageCode - language code
+     * @param {{
+     * action: string,
+     * text: string,
+     * languageCode?: keyof Languages,
+     * isDetailed?: boolean }} message
      * @param {(response) => void} callback - chrome sendMessage callback.
      */
-    handleTranslation(action, text, languageCode, callback) {
-        const message = {
-            action,
-            text,
-            languageCode,
-        };
+    handleTranslation(message, callback) {
         chrome.runtime.sendMessage(message, callback);
     }
 }
