@@ -4,7 +4,8 @@
   "description": "Translate selected text and provide explanations and breakdowns.",
   "main": "index.js",
   "scripts": {
-    "build": "webpack",
+    "start": "webpack --mode development --devtool inline-source-map --watch",
+    "build": "webpack --mode production",
     "lint": "npx eslint **/*.js  & npx stylelint **/*.css",
     "lint-js": "npx eslint **/*.js",
     "lint-css": "npx stylelint **/*.css"
