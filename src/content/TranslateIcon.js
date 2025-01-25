@@ -5,6 +5,7 @@ import SettingsService from '../background/SettingsService.js';
 import SelectionService from '../background/SelectionService.js';
 import TranslationService from '../background/TranslationService.js';
 import { ErrorMessages } from '../constants/errorMessages.js';
+import { getURL } from './chrome.js';
 
 class TranslateIcon {
     MAX_LENGTH_TEXT_FOR_TRANSLATION = 500;
@@ -33,7 +34,7 @@ class TranslateIcon {
                 const iconLoaderUrl = icon.getAttribute(
                     this.CustomIconAttributes.iconLoaderUrl,
                 );
-                icon.src = chrome.runtime.getURL(iconLoaderUrl);
+                icon.src = getURL(iconLoaderUrl);
             } else if (icon) {
                 icon.style.display = 'none';
             }
@@ -48,7 +49,7 @@ class TranslateIcon {
             const iconUrl = icon.getAttribute(
                 this.CustomIconAttributes.iconUrl,
             );
-            icon.src = chrome.runtime.getURL(iconUrl);
+            icon.src = getURL(iconUrl);
         });
     }
 
@@ -63,6 +64,7 @@ class TranslateIcon {
                 translation: response.translation,
                 text: response.text,
                 action: response.action,
+                isDetailed: response.isDetailed,
             });
         }
     }
@@ -86,7 +88,7 @@ class TranslateIcon {
         icon.style.padding = '0';
         icon.style.backgroundColor = 'white';
         icon.style.borderRadius = '4px';
-        icon.src = chrome.runtime.getURL(iconUrl);
+        icon.src = getURL(iconUrl);
         icon.setAttribute('data-icon-url', iconUrl);
         icon.setAttribute('data-icon-loader-url', this.LOADER_URL);
         return icon;
@@ -177,10 +179,7 @@ class TranslateIcon {
             (err) => {
                 if (err.message === ErrorMessages.APIKeyNotSet) {
                     window
-                        .open(
-                            chrome.runtime.getURL('views/settings.html'),
-                            '_blank',
-                        )
+                        .open(getURL('views/settings.html'), '_blank')
                         .focus();
                 } else if (err.message) {
                     alert(err.message);
@@ -205,13 +204,16 @@ class TranslateIcon {
             this.resetIcons();
             return;
         }
+        const isDetailed = action === MessageActions.translateDetailed;
         const callbackTranslation = this.translationResponseHandler.bind(this);
-        TranslationService.handleTranslation(
+        const message = {
             action,
-            selectedText,
+            text: selectedText,
             languageCode,
-            callbackTranslation,
-        );
+            isDetailed,
+        };
+
+        TranslationService.handleTranslation(message, callbackTranslation);
     }
 }
 

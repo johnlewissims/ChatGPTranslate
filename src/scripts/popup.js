@@ -1,7 +1,9 @@
+import { getURL } from '../content/chrome';
+
 document.addEventListener('DOMContentLoaded', () => {
     const settingsLinks = document.querySelectorAll('.settings-link');
     settingsLinks.forEach((link) => {
-        link.href = chrome.runtime.getURL('views/settings.html');
+        link.href = getURL('views/settings.html');
     });
 
     chrome.storage.local.get(

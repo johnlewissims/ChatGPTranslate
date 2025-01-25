@@ -1,6 +1,12 @@
 import { Languages } from '../scripts/defaultSettings';
 
-const getLanguageHint = (languageCode = '', targetLanguage = '') => {
+/**
+ * Get language name by its code.
+ *
+ * @param {string} languageCode it's a key of Languages.
+ * @returns {string}
+ */
+export const getLanguage = (languageCode) => {
     if (!languageCode) {
         return '';
     }
@@ -11,18 +17,30 @@ const getLanguageHint = (languageCode = '', targetLanguage = '') => {
         codeOnly = languageCode.split('-')[0]?.toLocaleLowerCase() ?? '';
     }
     if (codeOnly) {
-        const language = Languages[codeOnly];
-        if (language) {
-            if (
-                language.toLocaleLowerCase() ===
-                targetLanguage.toLocaleLowerCase()
-            ) {
-                return '';
-            }
-            return language;
-        }
+        return Languages[codeOnly] ?? '';
     }
     return '';
 };
 
-export { getLanguageHint };
+/**
+ * Get source text language.
+ *
+ * @param {string} languageCode it's a key of Languages.
+ * @param {string} targetLanguage language name. It's a value of Languages.
+ * @returns {string}
+ */
+export const getLanguageHint = (languageCode = '', targetLanguage = '') => {
+    if (!languageCode) {
+        return '';
+    }
+    const language = getLanguage(languageCode);
+    if (language) {
+        if (
+            language.toLocaleLowerCase() === targetLanguage.toLocaleLowerCase()
+        ) {
+            return '';
+        }
+        return language;
+    }
+    return '';
+};

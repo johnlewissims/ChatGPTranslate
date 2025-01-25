@@ -1,15 +1,25 @@
 const path = require('path');
+const fs = require('fs');
 
 const buildPath = path.resolve(__dirname, 'dist');
 const sourcePath = path.resolve(__dirname, 'src');
 
 const CopyPlugin = require('copy-webpack-plugin');
 
+const isDevelopment =
+    process.argv[process.argv.indexOf('--mode') + 1] === 'development';
+fs.writeFile(
+    `${sourcePath}/content/development.js`,
+    `export const IsDevelopment = ${isDevelopment};\n`,
+    () => void 0,
+);
+
 module.exports = {
-    mode: 'production',
     entry: {
         background: `${sourcePath}/background/background.js`,
         content: `${sourcePath}/content/content.js`,
+        settings: `${sourcePath}/scripts/settings.js`,
+        popup: `${sourcePath}/scripts/popup.js`,
     },
     output: {
         path: buildPath,
