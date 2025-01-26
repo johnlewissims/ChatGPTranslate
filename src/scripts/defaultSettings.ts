@@ -1,6 +1,11 @@
+export type LanguageCodes = keyof typeof Languages;
+
+export type LanguageCodesOrEmptyString = keyof typeof Languages | '';
+
 export const DefaultSettings = {
     MaxTokens: 100,
     GptModel: 'gpt-4o',
+    LanguageCode: 'en' as LanguageCodes,
     Language: 'English',
     MinTokensForHtmlAnswers: 300,
 };

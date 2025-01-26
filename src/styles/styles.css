@@ -141,3 +141,8 @@
     border-radius: var(--elem-radius);
     cursor: pointer;
 }
+
+.navbar-popup .footer {
+    display: flex;
+    justify-content: space-between;
+}

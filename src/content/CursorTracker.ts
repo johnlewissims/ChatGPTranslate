@@ -1,4 +1,5 @@
 class CursorTracker {
+    private cursorPosition: { x: number; y: number };
     constructor() {
         this.cursorPosition = { x: 0, y: 0 };
     }

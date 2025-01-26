@@ -1,11 +1,15 @@
-import { MessageActions } from '../constants/messageActions.js';
-import CursorTracker from './CursorTracker.js';
-import PopupManager from './PopupManager.js';
-import SettingsService from '../background/SettingsService.js';
-import SelectionService from '../background/SelectionService.js';
-import TranslationService from '../background/TranslationService.js';
-import { ErrorMessages } from '../constants/errorMessages.js';
-import { getURL } from './chrome.js';
+import { MessageActions } from '@src/constants/messageActions';
+import CursorTracker from './CursorTracker';
+import PopupManager from './PopupManager';
+import SettingsService from '@src/background/SettingsService';
+import SelectionService from '@src/background/SelectionService';
+import TranslationService, {
+    TranslationResponse,
+} from '@src/background/TranslationService';
+import { ErrorMessages } from '@src/constants/errorMessages';
+import { getURL } from './chrome';
+
+type Icon = HTMLImageElement | null;
 
 class TranslateIcon {
     MAX_LENGTH_TEXT_FOR_TRANSLATION = 500;
@@ -16,6 +20,9 @@ class TranslateIcon {
         iconUrl: 'data-icon-url',
         iconLoaderUrl: 'data-icon-loader-url',
     };
+
+    public icon: Icon;
+    public iconDetailed: Icon;
 
     get icons() {
         return [this.icon, this.iconDetailed];
@@ -28,13 +35,13 @@ class TranslateIcon {
 
     init() {}
 
-    updateIconAndHideAnother(selectedIcon) {
+    updateIconAndHideAnother(selectedIcon: Icon) {
         this.icons.map((icon) => {
-            if (icon === selectedIcon) {
+            if (icon !== null && icon === selectedIcon) {
                 const iconLoaderUrl = icon.getAttribute(
                     this.CustomIconAttributes.iconLoaderUrl,
                 );
-                icon.src = getURL(iconLoaderUrl);
+                icon.src = getURL(iconLoaderUrl!);
             } else if (icon) {
                 icon.style.display = 'none';
             }
@@ -49,11 +56,11 @@ class TranslateIcon {
             const iconUrl = icon.getAttribute(
                 this.CustomIconAttributes.iconUrl,
             );
-            icon.src = getURL(iconUrl);
+            icon.src = getURL(iconUrl!);
         });
     }
 
-    translationResponseHandler(response) {
+    translationResponseHandler(response: TranslationResponse) {
         if (response.error) {
             alert('Error fetching translation.');
             console.error('Error:', response.error);
@@ -62,8 +69,8 @@ class TranslateIcon {
             this.resetIcons();
             PopupManager.show({
                 translation: response.translation,
-                text: response.text,
-                action: response.action,
+                text: response.text as string,
+                action: response.action as string,
                 isDetailed: response.isDetailed,
             });
         }
@@ -77,7 +84,7 @@ class TranslateIcon {
         );
     }
 
-    createIcon(iconUrl) {
+    createIcon(iconUrl: string) {
         const icon = document.createElement('img');
         icon.style.position = 'absolute';
         icon.style.cursor = 'pointer';
@@ -167,20 +174,20 @@ class TranslateIcon {
         return this.icon && this.icon.style.display === 'block';
     }
 
-    contains(target) {
+    contains(target: EventTarget) {
         return (
-            (this.icon && this.icon.contains(target)) ||
-            (this.iconDetailed && this.iconDetailed.contains(target))
+            (this.icon && this.icon.contains(target as Node)) ||
+            (this.iconDetailed && this.iconDetailed.contains(target as Node))
         );
     }
 
-    async onClick(icon, maxTextLength, action) {
+    async onClick(icon: Icon, maxTextLength: number, action: string) {
         const isAPIKeyValid = !!(await SettingsService.getAPIKey().catch(
             (err) => {
                 if (err.message === ErrorMessages.APIKeyNotSet) {
                     window
                         .open(getURL('views/settings.html'), '_blank')
-                        .focus();
+                        ?.focus();
                 } else if (err.message) {
                     alert(err.message);
                 }

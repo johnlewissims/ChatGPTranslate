@@ -5,12 +5,12 @@ class SelectionService {
      * @param {Node | null} anchorNode
      * @returns {string}
      */
-    getLanguageCode(anchorNode) {
+    getLanguageCode(anchorNode: Node | null) {
         // Try to get a language code from the nearest parent.
         let node = anchorNode;
         while (node) {
-            if (node.lang) {
-                return node.lang;
+            if ((node as HTMLElement).lang) {
+                return (node as HTMLElement).lang;
             }
             node = node.parentNode;
         }
@@ -34,7 +34,7 @@ class SelectionService {
     getSelectedTextAndLanguageCode() {
         const selection = window.getSelection();
         const selectedText = selection?.toString().trim();
-        if (!selectedText) {
+        if (!selectedText || !selection) {
             return {};
         }
         const languageCode = this.getLanguageCode(selection.anchorNode);

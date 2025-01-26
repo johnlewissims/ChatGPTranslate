@@ -1,25 +1,25 @@
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import fs from 'fs';
+import CopyPlugin from 'copy-webpack-plugin';
+const __dirname = import.meta.dirname;
 
 const buildPath = path.resolve(__dirname, 'dist');
 const sourcePath = path.resolve(__dirname, 'src');
 
-const CopyPlugin = require('copy-webpack-plugin');
-
 const isDevelopment =
     process.argv[process.argv.indexOf('--mode') + 1] === 'development';
 fs.writeFile(
-    `${sourcePath}/content/development.js`,
+    `${sourcePath}/content/development.ts`,
     `export const IsDevelopment = ${isDevelopment};\n`,
     () => void 0,
 );
 
-module.exports = {
+export default {
     entry: {
-        background: `${sourcePath}/background/background.js`,
-        content: `${sourcePath}/content/content.js`,
-        settings: `${sourcePath}/scripts/settings.js`,
-        popup: `${sourcePath}/scripts/popup.js`,
+        background: `${sourcePath}/background/background`,
+        content: `${sourcePath}/content/content`,
+        settings: `${sourcePath}/scripts/settings`,
+        popup: `${sourcePath}/scripts/popup`,
     },
     output: {
         path: buildPath,
@@ -29,13 +29,10 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.ts$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['@babel/preset-env'],
-                    },
+                    loader: 'ts-loader',
                 },
             },
             {
@@ -45,7 +42,10 @@ module.exports = {
         ],
     },
     resolve: {
-        extensions: ['.js'],
+        alias: {
+            '@src': path.resolve(__dirname, 'src'),
+        },
+        extensions: ['.js', '.ts'],
     },
     plugins: [
         new CopyPlugin({
@@ -53,7 +53,6 @@ module.exports = {
                 { from: `${sourcePath}/manifest.json`, to: `${buildPath}/` },
                 { from: `${sourcePath}/views`, to: `${buildPath}/views` },
                 { from: `${sourcePath}/icons`, to: `${buildPath}/icons` },
-                { from: `${sourcePath}/scripts`, to: `${buildPath}/scripts` },
                 { from: `${sourcePath}/styles`, to: `${buildPath}/styles` },
             ],
         }),

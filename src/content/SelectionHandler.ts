@@ -1,7 +1,10 @@
-import TranslateIcon from './TranslateIcon.js';
-import SelectionService from '../background/SelectionService.js';
+import TranslateIcon from './TranslateIcon';
+import SelectionService from '@src/background/SelectionService';
 
 class SelectionHandler {
+    private selectedText: string;
+    private isExtensionContextDestroyed: boolean;
+
     constructor() {
         this.selectedText = '';
         this.isExtensionContextDestroyed = false;
@@ -23,7 +26,7 @@ class SelectionHandler {
                 return;
             }
             chrome.storage.local.get('enabled', (data) => {
-                this.selectedText = SelectionService.getSelectedText();
+                this.selectedText = SelectionService.getSelectedText() ?? '';
                 if (this.selectedText && data.enabled) {
                     TranslateIcon.show();
                 } else {
@@ -35,7 +38,7 @@ class SelectionHandler {
         document.addEventListener('mousedown', (event) => {
             if (
                 TranslateIcon.isVisible() &&
-                !TranslateIcon.contains(event.target)
+                !TranslateIcon.contains(event.target as Node)
             ) {
                 TranslateIcon.hide();
             }

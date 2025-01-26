@@ -1,5 +1,5 @@
-import { MessageActions } from '../constants/messageActions.js';
-import OpenAIService from './OpenAIService.js';
+import { MessageActions } from '@src/constants/messageActions';
+import OpenAIService from '@src/background/OpenAIService';
 
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
@@ -9,16 +9,22 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
-// eslint-disable-next-line no-unused-vars
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+chrome.contextMenus.onClicked.addListener((info) => {
     if (info.menuItemId === MessageActions.translateAndExplain) {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            chrome.tabs.sendMessage(tabs[0].id, { text: info.selectionText });
+            const id = tabs[0].id;
+            if (!id) {
+                return;
+            }
+            chrome.tabs.sendMessage(id, { text: info.selectionText });
         });
     }
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (!sender.tab) {
+        return;
+    }
     if (message.action === MessageActions.showPopup) {
         chrome.action.setPopup({
             tabId: sender.tab.id,
@@ -60,7 +66,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             message.languageCode,
             message.isDetailed ?? true,
             message.userDefinedLanguageCode ?? '',
-            message.userDefinedLanguageCode,
         )
             .then((response) => {
                 sendResponse({

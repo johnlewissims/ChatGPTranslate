@@ -1,3 +1,12 @@
+import { Message } from '@src/content/PopupManager';
+
+export type TranslationResponse = {
+    error?: string;
+    translation?: string;
+    explanation?: string;
+    audioDataUrl?: string;
+} & Partial<Message>;
+
 class TranslationService {
     /**
      * Get translation.
@@ -8,7 +17,10 @@ class TranslationService {
      * isDetailed?: boolean }} message
      * @param {(response) => void} callback - chrome sendMessage callback.
      */
-    handleTranslation(message, callback) {
+    handleTranslation(
+        message: unknown,
+        callback: (response: TranslationResponse) => void,
+    ) {
         chrome.runtime.sendMessage(message, callback);
     }
 }
