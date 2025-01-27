@@ -96,6 +96,8 @@
     width: 100%;
     text-wrap: auto;
     background-color: var(--main-bg-color);
+    box-shadow: none;
+    border: unset;
 }
 
 .navbar-popup {
