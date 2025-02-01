@@ -1,5 +1,7 @@
 config.js
+config.ts
 node_modules/
 dist/
 .vscode/
 debug.js
+debug.ts

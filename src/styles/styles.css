@@ -96,6 +96,8 @@
     width: 100%;
     text-wrap: auto;
     background-color: var(--main-bg-color);
+    box-shadow: none;
+    border: unset;
 }
 
 .navbar-popup {
@@ -140,4 +142,9 @@
     min-width: 90px;
     border-radius: var(--elem-radius);
     cursor: pointer;
+}
+
+.navbar-popup .footer {
+    display: flex;
+    justify-content: space-between;
 }

@@ -14,7 +14,7 @@ body {
 
 button {
     margin-top: 1rem;
-    margin-left: 20px;
+    margin-left: 1rem;
     padding: 4px 16px;
 }
 
@@ -26,4 +26,8 @@ textarea[name='api-key'] {
 
 select {
     min-width: 300px;
+}
+
+#settings-form #version {
+    margin-left: 1rem;
 }

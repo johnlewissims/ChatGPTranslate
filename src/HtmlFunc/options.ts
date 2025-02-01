@@ -6,8 +6,11 @@
  * @returns
  */
 export const createOptions = (
-    selectElementId,
-    optionsAsObjectWithKeyValueOrArray,
+    selectElementId: string,
+    optionsAsObjectWithKeyValueOrArray:
+        | []
+        | [string, string | number][]
+        | { [Property: string]: string },
 ) => {
     const selectElement = document.getElementById(selectElementId);
     if (!selectElement) {
@@ -15,7 +18,7 @@ export const createOptions = (
     }
 
     const options = Array.isArray(optionsAsObjectWithKeyValueOrArray)
-        ? optionsAsObjectWithKeyValueOrArray
+        ? (optionsAsObjectWithKeyValueOrArray as [string, string][])
         : Object.entries(optionsAsObjectWithKeyValueOrArray);
 
     for (const pair of options) {
@@ -26,7 +29,7 @@ export const createOptions = (
     }
 };
 
-export const clearAllChild = (selectElementId) => {
+export const clearAllChild = (selectElementId: string) => {
     const selectElement = document.getElementById(selectElementId);
     if (!selectElement) {
         return;

@@ -1,4 +1,4 @@
-import { Languages } from '../scripts/defaultSettings';
+import { Languages } from '@src/scripts/defaultSettings';
 
 /**
  * Get language name by its code.
@@ -6,7 +6,7 @@ import { Languages } from '../scripts/defaultSettings';
  * @param {string} languageCode it's a key of Languages.
  * @returns {string}
  */
-export const getLanguage = (languageCode) => {
+export const getLanguage = (languageCode = ''): string => {
     if (!languageCode) {
         return '';
     }
@@ -16,8 +16,8 @@ export const getLanguage = (languageCode) => {
     } else if (languageCode.indexOf('-') >= 0) {
         codeOnly = languageCode.split('-')[0]?.toLocaleLowerCase() ?? '';
     }
-    if (codeOnly) {
-        return Languages[codeOnly] ?? '';
+    if (codeOnly && codeOnly in Languages) {
+        return Languages[codeOnly as keyof typeof Languages] ?? '';
     }
     return '';
 };
@@ -29,7 +29,10 @@ export const getLanguage = (languageCode) => {
  * @param {string} targetLanguage language name. It's a value of Languages.
  * @returns {string}
  */
-export const getLanguageHint = (languageCode = '', targetLanguage = '') => {
+export const getLanguageHint = (
+    languageCode = '',
+    targetLanguage = '',
+): string => {
     if (!languageCode) {
         return '';
     }

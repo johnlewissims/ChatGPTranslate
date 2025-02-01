@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "ChatGPTranslate",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Highlight text and use ChatGPT to translate and explain it.",
     "permissions": ["activeTab", "contextMenus", "storage"],
     "background": {
@@ -34,7 +34,7 @@
                 "icons/loading-spinner.gif",
                 "views/popup.html",
                 "views/settings.html",
-                "content.js"
+                "content.bundle.js"
             ],
             "matches": ["<all_urls>"]
         }

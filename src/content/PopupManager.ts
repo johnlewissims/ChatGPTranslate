@@ -1,17 +1,29 @@
-import { Languages } from '../scripts/defaultSettings.js';
-import SettingsService from '../background/SettingsService.js';
-import TranslationService from '../background/TranslationService.js';
-import { MessageActions } from '../constants/messageActions.js';
-import '../styles/styles.css';
+import {
+    LanguageCodesOrEmptyString,
+    Languages,
+} from '@src/scripts/defaultSettings';
+import SettingsService from '@src/background/SettingsService';
+import TranslationService from '@src/background/TranslationService';
+import { MessageActions } from '@src/constants/messageActions';
+import '@src/styles/styles.css';
 
-import TranslateIcon from './TranslateIcon.js';
-import { createOptions } from '../HtmlFunc/options.js';
+import TranslateIcon from './TranslateIcon';
+import { createOptions } from '@src/HtmlFunc/options';
 import {
     disableElementById,
     enableElementById,
     hideElementById,
-} from '../HtmlFunc/attributes.js';
-import { getURL } from './chrome.js';
+} from '@src/HtmlFunc/attributes';
+import { getURL } from './chrome';
+
+export type Message = {
+    action: string;
+    text: string;
+    languageCode?: string;
+    isDetailed?: boolean;
+    userDefinedLanguageCode?: string;
+    translation?: string;
+};
 
 class PopupManager {
     action = '';
@@ -23,7 +35,7 @@ class PopupManager {
     changeLanguageTranslateButtonId = 'change-lang-form-submit';
     explanationLinkId = 'translation-popup-explanation-link';
 
-    createExplanationLink(text, popup) {
+    createExplanationLink(text: string, popup: HTMLElement) {
         const explanationLink = document.createElement('a');
         explanationLink.href = '#';
         explanationLink.id = this.explanationLinkId;
@@ -54,7 +66,9 @@ class PopupManager {
     }
 
     getElementChangeLanguageSelect() {
-        return document.getElementById(this.changeLanguageSelectId);
+        return document.getElementById(
+            this.changeLanguageSelectId,
+        ) as HTMLSelectElement;
     }
 
     /**
@@ -63,14 +77,15 @@ class PopupManager {
      * @returns {string}
      */
     getValueChangeLanguageSelect() {
-        return this.getElementChangeLanguageSelect().value;
+        return this.getElementChangeLanguageSelect()
+            ?.value as LanguageCodesOrEmptyString;
     }
 
     /**
      * Set selected language code value.
      * @param {string} value
      */
-    setValueChangeLanguageSelect(value) {
+    setValueChangeLanguageSelect(value: string) {
         const element = this.getElementChangeLanguageSelect();
         element.value = value;
     }
@@ -81,13 +96,21 @@ class PopupManager {
         if (Object.keys(savedUsedLanguages).length === 0) {
             savedUsedLanguages.en = 0;
         }
-        const orderedFavoriteLanguages = Object.entries({
-            ...savedUsedLanguages,
-        }).sort((a, b) => b[1] - a[1]);
+        const orderedFavoriteLanguages: [string, string | number][] =
+            Object.entries({
+                ...savedUsedLanguages,
+            }).sort((a, b) => b[1] - a[1]);
         const allLanguagesWithoutFavorites = { ...Languages };
         for (const lang of orderedFavoriteLanguages) {
-            lang[1] = allLanguagesWithoutFavorites[lang[0]];
-            delete allLanguagesWithoutFavorites[lang[0]];
+            if (lang[0] in allLanguagesWithoutFavorites) {
+                lang[1] =
+                    allLanguagesWithoutFavorites[
+                        lang[0] as keyof typeof Languages
+                    ];
+                delete allLanguagesWithoutFavorites[
+                    lang[0] as keyof typeof Languages
+                ];
+            }
         }
 
         const allLanguagesInRightOrder = [
@@ -101,7 +124,7 @@ class PopupManager {
         this.setValueChangeLanguageSelect(favoriteLanguageKeyValue[0]);
     }
 
-    async updateTranslationWithSelectedLanguage(event) {
+    async updateTranslationWithSelectedLanguage(event: Event) {
         event.preventDefault();
         const selectedLanguage = this.getValueChangeLanguageSelect();
         if (selectedLanguage) {
@@ -112,16 +135,20 @@ class PopupManager {
             'translation-popup-text',
         );
 
+        if (!translationElement) {
+            return;
+        }
+
         translationElement.style.color = this.updatingTextColor;
-        const pre = translationElement.getElementsByTagName('pre');
+        const pre = translationElement?.getElementsByTagName('pre');
         if (pre && pre.length === 1) {
             pre[0].style.color = this.updatingTextColor;
         }
 
         disableElementById(this.changeLanguageTranslateButtonId);
 
-        const newTranslation = await new Promise((resolve, reject) => {
-            const message = {
+        const newTranslation = await new Promise<string>((resolve, reject) => {
+            const message: Message = {
                 action: this.action,
                 text: this.text,
                 languageCode: selectedLanguage,
@@ -133,7 +160,7 @@ class PopupManager {
                 if (response.error) {
                     reject(response.error);
                 } else {
-                    resolve(response.translation);
+                    resolve(response.translation ?? '');
                 }
             });
         });
@@ -141,10 +168,10 @@ class PopupManager {
         translationElement.innerHTML = newTranslation;
     }
 
-    async show({ translation, text, action, isDetailed }) {
+    async show({ translation, text, action, isDetailed }: Message) {
         this.text = text;
         this.action = action;
-        this.isDetailed = isDetailed;
+        this.isDetailed = isDetailed ?? false;
 
         const popup = document.createElement('div');
         popup.id = 'translation-popup';
@@ -166,7 +193,7 @@ class PopupManager {
             </div>
         `;
 
-        const ttsIcon = translationSection.querySelector('#ttsIcon');
+        const ttsIcon = translationSection.querySelector('#ttsIcon') as Element;
         ttsIcon.addEventListener('click', () => this.playTextToSpeech(text));
         popup.appendChild(translationSection);
 
@@ -189,12 +216,12 @@ class PopupManager {
             this.updateTranslationWithSelectedLanguage.bind(this);
         document
             .getElementById('change-lang-form')
-            .addEventListener('submit', changeLangFormSubmitHandler);
+            ?.addEventListener('submit', changeLangFormSubmitHandler);
 
-        const hidePopup = (event) => {
+        const hidePopup = (event: Event) => {
             if (
                 popup &&
-                !popup.contains(event.target) &&
+                !popup.contains(event.target as Node) &&
                 event.target !== TranslateIcon.icon
             ) {
                 this.text = '';
@@ -209,7 +236,7 @@ class PopupManager {
         document.addEventListener('mousedown', hidePopup);
     }
 
-    async fetchExplanation(text) {
+    async fetchExplanation(text: string) {
         return new Promise((resolve, reject) => {
             TranslationService.handleTranslation(
                 {
@@ -227,8 +254,8 @@ class PopupManager {
         });
     }
 
-    async playTextToSpeech(text) {
-        return new Promise((resolve, reject) => {
+    async playTextToSpeech(text: string) {
+        return new Promise<void>((resolve, reject) => {
             TranslationService.handleTranslation(
                 {
                     action: MessageActions.textToSpeech,

@@ -7,7 +7,7 @@ root = true
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[**.{js,css,json,html}]
+[**.{js,css,json,html,ts}]
 charset = utf-8
 indent_style = space
 indent_size = 4

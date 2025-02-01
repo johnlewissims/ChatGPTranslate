@@ -1,13 +1,17 @@
-import { getLanguage, getLanguageHint } from './LanguageDetection.js';
-import SettingsService from './SettingsService.js';
+import { LanguageCodesOrEmptyString } from '@src/scripts/defaultSettings';
+import { getLanguage, getLanguageHint } from './LanguageDetection';
+import SettingsService from './SettingsService';
+
+type GptInstruction = {
+    role: 'system' | 'user';
+    content: string;
+};
 
 class OpenAIService {
-    constructor() {
-        this.apiUrl = 'https://api.openai.com/v1/chat/completions';
-        this.ttsApiUrl = 'https://api.openai.com/v1/audio/speech';
-    }
+    readonly apiUrl = 'https://api.openai.com/v1/chat/completions';
+    readonly ttsApiUrl = 'https://api.openai.com/v1/audio/speech';
 
-    async callOpenAI(messages) {
+    async callOpenAI(messages: Array<GptInstruction>) {
         const gptModel = await SettingsService.getGptModel();
         const apiKey = await SettingsService.getAPIKey();
         const maxTokens = await SettingsService.getMaxTokens();
@@ -41,7 +45,7 @@ class OpenAIService {
         }
     }
 
-    async getTextToSpeechDataUrl(text) {
+    async getTextToSpeechDataUrl(text: string) {
         const apiKey = await SettingsService.getAPIKey();
         const response = await fetch(this.ttsApiUrl, {
             method: 'POST',
@@ -72,8 +76,8 @@ class OpenAIService {
         });
     }
 
-    canRequestDetailDescription(text) {
-        return text && text?.length < 50 && text.split(' ').length < 5;
+    canRequestDetailDescription(text: string): boolean {
+        return !!text && text?.length < 50 && text.split(' ').length < 5;
     }
 
     /**
@@ -85,10 +89,10 @@ class OpenAIService {
      * @returns {[{role:string, content:string}]}
      */
     getOutBlocksMessages(
-        language,
+        language: string,
         isDetailedTranslation = false,
         userDefinedLanguage = '',
-    ) {
+    ): GptInstruction[] {
         if (isDetailedTranslation) {
             if (userDefinedLanguage) {
                 return [
@@ -169,7 +173,11 @@ class OpenAIService {
      * @param {string} language target language from settings.
      * @returns {[{role:string, content:string}]}
      */
-    getLanguageHintMessage(languageCode, userDefinedLanguage, language) {
+    getLanguageHintMessage(
+        languageCode: LanguageCodesOrEmptyString,
+        userDefinedLanguage: string,
+        language: string,
+    ): GptInstruction[] {
         const languageHint = getLanguageHint(languageCode, language);
         if (!userDefinedLanguage) {
             return languageHint
@@ -197,7 +205,10 @@ class OpenAIService {
      * @param {string} language target language from settings.
      * @returns {[{role:string, content:string}]}
      */
-    getDetectLanguageInstruction(userDefinedLanguage, language) {
+    getDetectLanguageInstruction(
+        userDefinedLanguage: string,
+        language: string,
+    ): GptInstruction[] {
         return userDefinedLanguage
             ? []
             : [
@@ -216,11 +227,12 @@ class OpenAIService {
      *
      * @returns {string} translation in plain text or HTML.
      */
+
     async translateText(
-        text,
-        languageCode = '',
+        text: string,
+        languageCode: LanguageCodesOrEmptyString = '',
         isDetailedTranslation = false,
-        userDefinedLanguageCode = '',
+        userDefinedLanguageCode: LanguageCodesOrEmptyString = '',
     ) {
         const language = await SettingsService.getLanguage();
         const userDefinedLanguage = getLanguage(userDefinedLanguageCode);
@@ -241,7 +253,7 @@ class OpenAIService {
             userDefinedLanguage,
             language,
         );
-        const messages = [
+        const messages: GptInstruction[] = [
             {
                 role: 'system',
                 content: 'You are a helpful assistant that translates text.',
@@ -271,10 +283,10 @@ class OpenAIService {
         return { translation: result || 'Translation not available' };
     }
 
-    async fetchExplanation(text) {
+    async fetchExplanation(text: string) {
         const language = await SettingsService.getLanguage();
 
-        const messages = [
+        const messages: Array<GptInstruction> = [
             {
                 role: 'system',
                 content:
