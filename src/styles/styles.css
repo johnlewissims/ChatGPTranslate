@@ -28,7 +28,7 @@
 #translation-popup div,
 #translation-popup pre {
     color: var(--main-color-black);
-    font-size: 16px;
+    font-size: 1rem;
     margin: 0 0 4px;
     font-family: Arial, sans-serif;
 }
@@ -102,7 +102,7 @@
 
 .navbar-popup {
     width: 300px;
-    font-size: 16px;
+    font-size: 1rem;
 }
 
 #translation-popup #change-lang-form {
@@ -121,6 +121,7 @@
 }
 
 #translation-popup #change-lang-form select {
+    color: var(--main-color-black);
     line-height: 1.2em;
     font-size: 1em;
     background: none;
@@ -134,6 +135,7 @@
 }
 
 #translation-popup #change-lang-form button {
+    color: var(--main-color-black);
     height: 1.5em;
     line-height: 1.2em;
     font-size: 1em;
