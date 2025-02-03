@@ -1,31 +1,27 @@
-body {
-    font-size: 16px;
-}
-
 .item {
-    padding-left: 20px;
+    padding-left: 1.25rem;
     margin-bottom: 1rem;
 }
 
 .item label {
-    min-width: 130px;
+    min-width: 8rem;
     display: inline-block;
 }
 
 button {
     margin-top: 1rem;
     margin-left: 1rem;
-    padding: 4px 16px;
+    padding: 0.25rem 1rem;
 }
 
 textarea[name='api-key'] {
-    min-width: 300px;
+    min-width: 20rem;
     margin-top: 0.5rem;
     box-sizing: border-box;
 }
 
 select {
-    min-width: 300px;
+    min-width: 20rem;
 }
 
 #settings-form #version {
