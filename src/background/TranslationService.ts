@@ -1,11 +1,4 @@
-import { Message } from '@src/content/PopupManager';
-
-export type TranslationResponse = {
-    error?: string;
-    translation?: string;
-    explanation?: string;
-    audioDataUrl?: string;
-} & Partial<Message>;
+import { TranslationResponse } from './TranslationResponse';
 
 class TranslationService {
     /**

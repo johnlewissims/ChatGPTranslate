@@ -3,11 +3,10 @@ import CursorTracker from './CursorTracker';
 import PopupManager from './PopupManager';
 import SettingsService from '@src/background/SettingsService';
 import SelectionService from '@src/background/SelectionService';
-import TranslationService, {
-    TranslationResponse,
-} from '@src/background/TranslationService';
+import TranslationService from '@src/background/TranslationService';
 import { ErrorMessages } from '@src/constants/errorMessages';
 import { getURL } from './chrome';
+import { TranslationResponse } from '@src/background/TranslationResponse';
 
 type Icon = HTMLImageElement | null;
 
@@ -144,7 +143,7 @@ class TranslateIcon {
                 this.onClick(
                     this.iconDetailed,
                     this.MAX_LENGTH_TEXT_FOR_DETAILED_TRANSLATION,
-                    MessageActions.translateDetailed,
+                    MessageActions.translateAndExplain,
                 ),
             );
             document.body.appendChild(this.iconDetailed);
@@ -211,13 +210,12 @@ class TranslateIcon {
             this.resetIcons();
             return;
         }
-        const isDetailed = action === MessageActions.translateDetailed;
         const callbackTranslation = this.translationResponseHandler.bind(this);
         const message = {
             action,
             text: selectedText,
             languageCode,
-            isDetailed,
+            isDetailed: icon === this.iconDetailed,
         };
 
         TranslationService.handleTranslation(message, callbackTranslation);

@@ -15,15 +15,7 @@ import {
     hideElementById,
 } from '@src/HtmlFunc/attributes';
 import { getURL } from './chrome';
-
-export type Message = {
-    action: string;
-    text: string;
-    languageCode?: string;
-    isDetailed?: boolean;
-    userDefinedLanguageCode?: string;
-    translation?: string;
-};
+import { Message } from './Message';
 
 class PopupManager {
     action = '';
@@ -197,7 +189,7 @@ class PopupManager {
         ttsIcon.addEventListener('click', () => this.playTextToSpeech(text));
         popup.appendChild(translationSection);
 
-        if (action !== MessageActions.translateDetailed) {
+        if (!isDetailed) {
             const alwaysDisplayExplanation =
                 await SettingsService.getAlwaysDisplayExplanation();
             if (alwaysDisplayExplanation) {
