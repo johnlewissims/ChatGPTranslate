@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+    <head>
+        <title>ChatGPTranslate chat</title>
+        <link rel="stylesheet" href="../styles/chat.css" />
+        <link rel="icon" type="image/png" href="../icons/icon.png" />
+    </head>
+
+    <body>
+        <h1>Chat (each question is independent)</h1>
+        <div class="container">
+            <ul id="answers-list" class="answers-list">
+                <li id="stub" class="answer">Answer will be shown here...</li>
+            </ul>
+            <form class="question-form">
+                <div class="instructions">
+                    <label>Instruction for GPT:</label>
+                    <input
+                        type="text"
+                        id="instruction"
+                        placeholder="It is the optional field. You may write instructions in the message."
+                    />
+                </div>
+                <div class="question-text">
+                    <textarea
+                        id="message-to-gpt"
+                        placeholder="Message text"
+                    ></textarea>
+                    <button type="button" id="send-message">Send</button>
+                </div>
+            </form>
+        </div>
+        <script type="module" src="../chat.bundle.js"></script>
+    </body>
+</html>

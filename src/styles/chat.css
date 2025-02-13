@@ -1,0 +1,124 @@
+:root {
+    --main-bg-color: white;
+    --main-color-black: black;
+    --main-color-grey-dark: #333;
+    --main-color-grey-medium: #666;
+    --main-color-grey-light: #ccc;
+    --border-color: #666;
+    --elem-radius: 4px;
+    --form-width: 900px;
+}
+
+body {
+    margin: 0;
+    font-size: 100%;
+}
+
+textarea {
+    font-size: 1rem;
+}
+
+h1 {
+    line-height: 2rem;
+    font-size: 2rem;
+    margin: 1rem;
+}
+
+ul {
+    padding-left: 1rem;
+}
+
+li {
+    padding-left: 0;
+}
+
+input,
+textarea {
+    padding: 0.25rem 0.5rem;
+}
+
+#stub {
+    color: var(--main-color-grey-medium);
+    list-style-type: none;
+}
+
+.container {
+    position: relative;
+    margin: 0 1rem;
+    box-sizing: border-box;
+}
+
+.answers-list {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 14rem);
+    padding: 0 1.5rem;
+    overflow-y: scroll;
+    max-width: var(--form-width);
+    box-sizing: border-box;
+}
+
+.question-form {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: start;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.625rem;
+    max-width: var(--form-width);
+    min-height: 9rem;
+    padding: 0 1rem;
+    box-sizing: border-box;
+}
+
+.question-form .question-text {
+    width: 100%;
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    gap: 0.625rem;
+}
+
+.question-form textarea {
+    width: calc(100% - 60px);
+    height: 4.8rem;
+    resize: none;
+    border-radius: var(--elem-radius);
+    border: 1px solid var(--border-color);
+}
+
+.question-form button {
+    width: 60px;
+    padding: 0.25rem 1rem;
+    border-radius: var(--elem-radius);
+    border: 1px solid var(--border-color);
+}
+
+.answer:not(#stub) {
+    color: var(--main-color-black);
+    list-style-type: 'A: ';
+}
+
+.question {
+    margin: 0.5rem 0;
+    font-weight: 600;
+    color: var(--main-color-grey-dark);
+    list-style-type: 'Q: ';
+}
+
+.instructions {
+    width: 100%;
+    display: flex;
+    gap: 0.625rem;
+}
+
+.instructions label {
+    flex: 0 0 auto;
+}
+
+.instructions input {
+    flex: 1 0 auto;
+}

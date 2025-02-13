@@ -20,6 +20,7 @@ export default {
         content: `${sourcePath}/content/content`,
         settings: `${sourcePath}/scripts/settings`,
         popup: `${sourcePath}/scripts/popup`,
+        chat: `${sourcePath}/scripts/chat`,
     },
     output: {
         path: buildPath,

@@ -1,6 +1,10 @@
 import { LanguageCodesOrEmptyString } from '@src/scripts/defaultSettings';
 import { getLanguage, getLanguageHint } from './LanguageDetection';
 import SettingsService from './SettingsService';
+import { ErrorMessages } from '@src/constants/errorMessages';
+import { ChatMessage } from '@src/Models/ChatMessage';
+import { OpenAITranslation } from '@src/Models/OpenAITranslation';
+import { OpenAIExplanation } from '@src/Models/OpenAIExplanation';
 
 type GptInstruction = {
     role: 'system' | 'user';
@@ -11,6 +15,11 @@ class OpenAIService {
     readonly apiUrl = 'https://api.openai.com/v1/chat/completions';
     readonly ttsApiUrl = 'https://api.openai.com/v1/audio/speech';
 
+    /**
+     * Send a request to GPT and return the response.
+     *
+     * @throws Error fetching data from OpenAI
+     */
     async callOpenAI(messages: Array<GptInstruction>) {
         const gptModel = await SettingsService.getGptModel();
         const apiKey = await SettingsService.getAPIKey();
@@ -233,7 +242,7 @@ class OpenAIService {
         languageCode: LanguageCodesOrEmptyString = '',
         isDetailedTranslation = false,
         userDefinedLanguageCode: LanguageCodesOrEmptyString = '',
-    ) {
+    ): Promise<OpenAITranslation> {
         const language = await SettingsService.getLanguage();
         const userDefinedLanguage = getLanguage(userDefinedLanguageCode);
         const isTranslationAsHtml =
@@ -271,19 +280,14 @@ class OpenAIService {
                 content: `Output must be in HTML without <head> and <body> tags.`,
             });
         }
-        let result = await this.callOpenAI(messages);
-        if (!isTranslationAsHtml) {
-            return {
-                translation: `<pre>${result || 'Translation not available'}</pre>`,
-            };
-        } else if (result.startsWith('```html')) {
-            result = result.replace('```html\n', '').replace('\n```', '\n');
-        }
+        const result = await this.callOpenAI(messages).catch(
+            (err) => err as Error,
+        );
 
-        return { translation: result || 'Translation not available' };
+        return this.getOpenAITranslation(result, isTranslationAsHtml, true);
     }
 
-    async fetchExplanation(text: string) {
+    async fetchExplanation(text: string): Promise<OpenAIExplanation> {
         const language = await SettingsService.getLanguage();
 
         const messages: Array<GptInstruction> = [
@@ -297,8 +301,86 @@ class OpenAIService {
                 content: `Provide a short explanation for the following text in ${language}: \n\n"${text}"`,
             },
         ];
-        const result = await this.callOpenAI(messages);
-        return { explanation: result || 'Explanation not available' };
+        const result = await this.callOpenAI(messages).catch(
+            (err) => err as Error,
+        );
+        if (typeof result === 'string') {
+            return { explanation: result || 'Explanation not available' };
+        } else {
+            return {
+                explanation: this.getTranslationErrorText(result),
+            };
+        }
+    }
+
+    async sendChatMessage({
+        message,
+        instruction,
+    }: ChatMessage): Promise<OpenAITranslation> {
+        const messages: GptInstruction[] = [];
+        if (instruction) {
+            messages.push({ role: 'system', content: instruction });
+        }
+
+        messages.push({ role: 'user', content: message });
+        const result = await this.callOpenAI(messages).catch((err) => {
+            if (err instanceof Error) {
+                return err;
+            }
+
+            return err as unknown;
+        });
+
+        return this.getOpenAITranslation(result);
+    }
+
+    /**
+     * Converts OpenAI result into translation.
+     *
+     * @param openAIResult result of OpenAI request
+     */
+    getOpenAITranslation(
+        openAIResult: string | Error | unknown,
+        isTranslationAsHtml: boolean = false,
+        shouldWrappedIntoPre: boolean = false,
+    ): OpenAITranslation {
+        if (typeof openAIResult === 'string') {
+            if (!isTranslationAsHtml) {
+                if (shouldWrappedIntoPre) {
+                    return {
+                        translation: `<pre>${openAIResult || 'Translation not available'}</pre>`,
+                    };
+                }
+
+                return {
+                    translation: openAIResult || 'Translation not available',
+                };
+            } else if (openAIResult.startsWith('```html')) {
+                return {
+                    translation:
+                        openAIResult
+                            .replace('```html\n', '')
+                            .replace('\n```', '\n') ||
+                        'Translation not available',
+                };
+            }
+
+            return { translation: openAIResult || 'Translation not available' };
+        } else if (openAIResult instanceof Error) {
+            return {
+                translation: this.getTranslationErrorText(openAIResult),
+            };
+        } else {
+            return {
+                translation:
+                    'Answer not available. GPT error: ' +
+                    JSON.stringify(openAIResult),
+            };
+        }
+    }
+
+    getTranslationErrorText(gptError: Error): string {
+        return `${ErrorMessages.GptApiErrorHeader} ${gptError.message || 'Translation not available'}`;
     }
 }
 
