@@ -8,6 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
         link.href = getURL('views/settings.html');
     });
 
+    const chatLink = document.getElementById(
+        'link-to-chat-with-GPT',
+    ) as HTMLLinkElement;
+    if (chatLink) {
+        chatLink.href = getURL('views/chat.html');
+    }
+
     chrome.storage.local.get(
         ['translation', 'explanation', 'OPENAI_API_KEY'],
         (data) => {

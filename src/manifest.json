@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "ChatGPTranslate",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Highlight text and use ChatGPT to translate and explain it.",
     "permissions": ["activeTab", "contextMenus", "storage"],
     "background": {
