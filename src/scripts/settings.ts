@@ -2,10 +2,7 @@ import { clearAllChild, createOptions } from '@src/HtmlFunc/options';
 import { DefaultSettings, LanguageCodes, Languages } from './defaultSettings';
 import { getVersion } from '@src/content/chrome';
 
-let gptModelsForOptions: { [Property: string]: string } = {
-    'gpt-4o': 'gpt-4o',
-    'gpt-4o-mini': 'gpt-4o-mini',
-};
+let gptModelsForOptions: { [Property: string]: string } = {};
 
 const updateGptModelAttributeDisabled = () => {
     document
@@ -39,7 +36,10 @@ const loadAllGptModels = async () => {
     const data = await response.json();
     if (response.ok) {
         gptModelsForOptions = {};
-        for (const model of data.data) {
+        const models = (data.data as { id: string }[]).sort((a, b) =>
+            a.id > b.id ? 1 : -1,
+        );
+        for (const model of models) {
             gptModelsForOptions[model.id] = model.id;
         }
         clearAllChild('gpt-model');
@@ -52,6 +52,7 @@ const loadAllGptModels = async () => {
 
     (document.getElementById('gpt-model') as HTMLSelectElement).value =
         savedValue;
+    updateGptModelAttributeDisabled();
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -74,7 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.OPENAI_API_KEY) {
                 (document.getElementById('api-key') as HTMLInputElement).value =
                     result.OPENAI_API_KEY;
-                loadAllGptModels();
+                loadAllGptModels().then(() => {
+                    model.value = result.gptModel ?? DefaultSettings.GptModel;
+                });
             }
             (
                 document.getElementById(

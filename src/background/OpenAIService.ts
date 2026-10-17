@@ -1,32 +1,54 @@
 import { LanguageCodesOrEmptyString } from '@src/scripts/defaultSettings';
 import { getLanguage, getLanguageHint } from './LanguageDetection';
+import { ErrorMessages } from '@src/constants/errorMessages';
 import SettingsService from './SettingsService';
+import { OpenAITranslation } from '@src/Models/OpenAITranslation';
+import { OpenAIExplanation } from '@src/Models/OpenAIExplanation';
 
 type GptInstruction = {
     role: 'system' | 'user';
     content: string;
 };
 
+type RequestBody = {
+    model: string;
+    messages: GptInstruction[];
+    max_tokens?: number;
+    max_completion_tokens?: number;
+};
+
 class OpenAIService {
     readonly apiUrl = 'https://api.openai.com/v1/chat/completions';
     readonly ttsApiUrl = 'https://api.openai.com/v1/audio/speech';
 
+    /**
+     * Send a request to GPT and return the response.
+     *
+     * @throws Error fetching data from OpenAI
+     */
     async callOpenAI(messages: Array<GptInstruction>) {
         const gptModel = await SettingsService.getGptModel();
         const apiKey = await SettingsService.getAPIKey();
         const maxTokens = await SettingsService.getMaxTokens();
         const displayTokens = !!(await SettingsService.getDisplayTokens());
+        const body: RequestBody = {
+            model: gptModel,
+            messages: messages,
+        };
+        if (this.isOldModelWithMaxTokensSimplestCheck(gptModel)) {
+            body.max_tokens = maxTokens;
+            delete body.max_completion_tokens;
+        } else {
+            delete body.max_tokens;
+            body.max_completion_tokens = maxTokens;
+        }
         const response = await fetch(this.apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${apiKey}`,
             },
-            body: JSON.stringify({
-                model: gptModel,
-                messages: messages,
-                max_tokens: maxTokens,
-            }),
+            body: JSON.stringify(body),
         });
 
         const data = await response.json();
@@ -57,6 +79,7 @@ class OpenAIService {
                 model: 'tts-1',
                 voice: 'alloy',
                 input: text,
+                response_format: 'mp3',
             }),
         });
 
@@ -233,7 +256,7 @@ class OpenAIService {
         languageCode: LanguageCodesOrEmptyString = '',
         isDetailedTranslation = false,
         userDefinedLanguageCode: LanguageCodesOrEmptyString = '',
-    ) {
+    ): Promise<OpenAITranslation> {
         const language = await SettingsService.getLanguage();
         const userDefinedLanguage = getLanguage(userDefinedLanguageCode);
         const isTranslationAsHtml =
@@ -271,19 +294,13 @@ class OpenAIService {
                 content: `Output must be in HTML without <head> and <body> tags.`,
             });
         }
-        let result = await this.callOpenAI(messages);
-        if (!isTranslationAsHtml) {
-            return {
-                translation: `<pre>${result || 'Translation not available'}</pre>`,
-            };
-        } else if (result.startsWith('```html')) {
-            result = result.replace('```html\n', '').replace('\n```', '\n');
-        }
-
-        return { translation: result || 'Translation not available' };
+        const result = await this.callOpenAI(messages).catch(
+            (err) => err as Error,
+        );
+        return this.getOpenAITranslation(result, isTranslationAsHtml, true);
     }
 
-    async fetchExplanation(text: string) {
+    async fetchExplanation(text: string): Promise<OpenAIExplanation> {
         const language = await SettingsService.getLanguage();
 
         const messages: Array<GptInstruction> = [
@@ -297,8 +314,76 @@ class OpenAIService {
                 content: `Provide a short explanation for the following text in ${language}: \n\n"${text}"`,
             },
         ];
-        const result = await this.callOpenAI(messages);
-        return { explanation: result || 'Explanation not available' };
+        const result = await this.callOpenAI(messages).catch(
+            (err) => err as Error,
+        );
+        if (typeof result === 'string') {
+            return { explanation: result || 'Explanation not available' };
+        } else {
+            return {
+                explanation: this.getTranslationErrorText(result),
+            };
+        }
+    }
+
+    /**
+     * Converts OpenAI result into translation.
+     *
+     * @param openAIResult result of OpenAI request
+     */
+    getOpenAITranslation(
+        openAIResult: string | Error | unknown,
+        isTranslationAsHtml: boolean = false,
+        shouldWrappedIntoPre: boolean = false,
+    ): OpenAITranslation {
+        if (typeof openAIResult === 'string') {
+            if (!isTranslationAsHtml) {
+                if (shouldWrappedIntoPre) {
+                    return {
+                        translation: `<pre>${openAIResult || 'Translation not available'}</pre>`,
+                    };
+                }
+
+                return {
+                    translation: openAIResult || 'Translation not available',
+                };
+            } else if (openAIResult.startsWith('```html')) {
+                return {
+                    translation:
+                        openAIResult
+                            .replace('```html\n', '')
+                            .replace('\n```', '\n') ||
+                        'Translation not available',
+                };
+            }
+
+            return { translation: openAIResult || 'Translation not available' };
+        } else if (openAIResult instanceof Error) {
+            return {
+                translation: this.getTranslationErrorText(openAIResult),
+            };
+        } else {
+            return {
+                translation:
+                    'Answer not available. GPT error: ' +
+                    JSON.stringify(openAIResult),
+            };
+        }
+    }
+
+    getTranslationErrorText(gptError: Error): string {
+        return `${ErrorMessages.GptApiErrorHeader} ${gptError.message || 'Translation not available'}`;
+    }
+
+    isOldModelWithMaxTokensSimplestCheck(gptModel: string): boolean {
+        const gptModelLower = gptModel?.toLocaleLowerCase() ?? '';
+        if (gptModelLower.startsWith('gpt-4')) {
+            return true;
+        }
+
+        // GPT-4 models retirement date: January 14, 2027
+        // GPT-4o, GPT-4o mini, GPT-4.1 and GPT-4.1 mini
+        return false;
     }
 }
 
