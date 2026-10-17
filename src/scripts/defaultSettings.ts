@@ -4,7 +4,7 @@ export type LanguageCodesOrEmptyString = keyof typeof Languages | '';
 
 export const DefaultSettings = {
     MaxTokens: 100,
-    GptModel: 'gpt-4o',
+    GptModel: 'gpt-6-luna',
     LanguageCode: 'en' as LanguageCodes,
     Language: 'English',
     MinTokensForHtmlAnswers: 300,
